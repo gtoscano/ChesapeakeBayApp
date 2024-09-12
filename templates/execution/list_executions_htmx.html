@@ -1,0 +1,462 @@
+{% extends 'core/base.html' %}
+
+{% load crispy_forms_tags %}
+{% load render_table from django_tables2 %}
+{% load static %}
+
+{% block head %}
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+<style>
+.modal-background {
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.modal-content {
+    background-color: #fefefe;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+
+}
+
+.drawer-side {
+    z-index: 100; /* Example value; adjust as needed based on your layout */
+}
+.dt-body-right {
+    text-align: right;
+}
+</style>
+{% endblock %}
+
+
+{% block content %}
+
+{{ selected_edge|json_script:"selected-edge" }}
+{{ data_points|json_script:"data-points" }}
+{{ pareto_front|json_script:"pareto-front" }}
+{{ scenario_id|json_script:"scenario-id" }}
+
+
+<div
+    class="container mx-auto p-4"
+    x-data="scatterPlotApp()"
+    x-init="initPlot()"
+>
+    <div class="px-5 my-5 text-center">
+        <h1 class="text-4xl font-bold text-primary">{{ page_title }}</h1>
+        <p></p>
+    </div>
+
+    <div class="drawer drawer-end">
+        <input id="my-drawer-4" type="checkbox" class="drawer-toggle" />
+        <div class="drawer-content fixed right-0">
+            <!-- Page content here -->
+            <label
+                for="my-drawer-4"
+                class="drawer-button btn hover:bg-green-800"
+            >
+                <span class="material-icons">settings</span>
+            </label>
+        </div>
+
+        <div class="drawer-side">
+            <label
+                for="my-drawer-4"
+                aria-label="close sidebar"
+                class="drawer-overlay"
+            ></label>
+            <div
+                id="drawer-content"
+                namae="drawer-content"
+                class="p-4 w-80 min-h-full bg-base-200 text-base-content"
+            >
+                {% include 'execution/partials/_drawer_content.html' %}
+            </div>
+        </div>
+    </div>
+    <!--- <button @click="openModal = true">Open Modal</button> -->
+
+    <div id="plot"></div>
+    <!-- Plotly plot will be rendered here -->
+    <table id="infoTable" class="display" style="width: 100%">
+        <!-- Table will be filled dynamically -->
+    </table>
+
+    <div id="table-container2" name="table-container2">
+        {% include 'execution/partials/_table.html' %}
+    </div>
+
+
+        {% if create_url %}
+            <a href="{{ create_url }}" class="btn btn-primary">
+                {{ create_title }}
+            </a>
+        {% endif %}
+    <div class="px-5 my-5 text-right">
+        <a
+            href="{{ request.META.HTTP_REFERER|escape }}"
+            class="btn btn-secondary btn-sm"
+        >
+            <i class="material-icons">arrow_back</i>
+        </a>
+    </div>
+</div>
+
+
+{% endblock %}
+
+
+
+
+{% block scripts %}
+
+<script>
+
+function initializeDataTables() {
+    // Destroy existing DataTables instance if exists to avoid reinitialization errors
+    var tableSelector = '.my-table';
+    if ($.fn.DataTable.isDataTable(tableSelector)) {
+        $(tableSelector).DataTable().destroy();
+    }
+
+    // Initialize DataTables
+    $(tableSelector).DataTable({
+        "pagingType": "simple_numbers",
+        "searching": true,
+        "ordering": true,
+        "autoWidth": false,
+        "pageLength": 25,
+         columnDefs: [
+           { 
+             targets: [], 
+             className: "dt-body-right", // Apply right text alignment
+             render: function ( data, type, row, meta ) {
+                 if(type === 'display'){
+                     return parseInt(data).toLocaleString('en-US');
+                 }
+                 return data; // Return unaltered data for other types ('sort', 'type', 'filter')
+             }
+           }],
+    });
+}
+
+// Call the function on document ready to initialize DataTables
+$(document).ready(function() {
+    initializeDataTables();
+});
+//document.body.addEventListener('htmx:afterSwap', function(event) {
+//    if (event.detail.target.id === 'table-container2') {
+//        initializeDataTables();
+//    }
+//});
+document.body.addEventListener('htmx:afterSwap', function(event) {
+    if (event.detail.target.id === 'selectionEdge') {
+        const response = JSON.parse(event.detail.xhr.response);
+        const app = scatterPlotApp(); // Or however you access your app instance
+        app.updateDataAndPlot(response.dataPoints, response.paretoFront);
+    }
+});
+document.body.addEventListener('htmx:afterRequest', function(event) {
+    if (event.detail.path === "{% url 'list_executions' id=scenario_id %}") {
+        // Prevent default HTMX DOM manipulations
+        event.preventDefault();
+
+        // Assuming you have a way to parse the response and update the plot
+        const response = JSON.parse(event.detail.xhr.responseText);
+        const app = scatterPlotApp(); // Or however you access or instantiate your scatterPlotApp
+        app.updateDataAndPlot(response.dataPoints, response.paretoFront);
+    }
+});
+
+function scatterPlotApp() {
+    return {
+        paretoFront: JSON.parse('{{ pareto_front|safe }}'), // Initial data points
+        dataPoints: JSON.parse('{{ data_points|safe }}'), // Initial data points
+        openModal: false,
+        scenarioId: null, // Initial data points
+        selectedIndices: [], // Tracks selected points by their indices
+        selectedEdge: null, // Initial selected edge
+        selectPlotType: 'scatter', // Default plot type
+        selectYAxis: 'N', // options are 'pollutant',  'cost', 'N', 'P', 'S'
+        selectXAxis: 'Cost', // options are 'pollutant',  'cost', 'N', 'P', 'S'
+        initPlot: function() {
+            this.openModal = false;
+            this.selectedEdge = JSON.parse(document.getElementById('selected-edge').textContent);
+            this.scenarioId = JSON.parse(document.getElementById('scenario-id').textContent);
+            this.plotData(this.dataPoints);
+        },
+        updateDataAndPlot: function(dataPoints, paretoFront) {
+            this.dataPoints = dataPoints;
+            this.paretoFront = paretoFront;
+            this.plotData(this.dataPoints);
+        },
+        updatePlotType: function() {
+            this.selectPlotType = document.getElementById('selectPlotTypeID').value;
+            this.selectYAxis = document.getElementById('selectYAxisID').value;
+            this.selectXAxis = document.getElementById('selectXAxisID').value;
+            this.plotData(this.dataPoints); // Re-plot with the new type
+        },
+        plotData: function(dataSets) {
+            const component = this; // Reference to use inside nested functions
+            const selectPlotType = this.selectPlotType; // Use the component's state
+            const selectXAxis= this.selectXAxis; // Use the component's state
+            const selectYAxis= this.selectYAxis; // Use the component's state
+            const colorPalette = ['blue', 'green', 'orange', 'purple', 'yellow', 'cyan', 'magenta', 'lime', 'pink', 'teal'];
+            let trace, layout;
+            let traces = []; // Array to hold all the trace objects for Plotly
+            
+            if (selectPlotType === 'scatter') {
+                dataSets.forEach((data, dataIndex) => {
+                    let xAxisData = data.map(point => {
+                        if (selectXAxis === 'N') return point.N;
+                        else if (selectXAxis === 'P') return point.P;
+                        else if (selectXAxis === 'S') return point.S;
+                        else if (selectXAxis === 'NR') return point.NR;
+                        else if (selectXAxis === 'PR') return point.PR;
+                        else if (selectXAxis === 'SR') return point.SR;
+                        else if (selectXAxis === 'NP') return point.NP;
+                        else if (selectXAxis === 'PP') return point.PP;
+                        else if (selectXAxis === 'SP') return point.SP;
+                        else return point.Cost; // Default to 'Pollutant' if none match
+                    });
+                    let yAxisData = data.map(point => {
+                        if (selectYAxis === 'N') return point.N;
+                        else if (selectYAxis === 'P') return point.P;
+                        else if (selectYAxis === 'S') return point.S;
+                        else if (selectYAxis === 'NR') return point.NR;
+                        else if (selectYAxis === 'PR') return point.PR;
+                        else if (selectYAxis === 'SR') return point.SR;
+                        else if (selectYAxis === 'NP') return point.NP;
+                        else if (selectYAxis === 'PP') return point.PP;
+                        else if (selectYAxis === 'SP') return point.SP;
+                        else return point.Cost; // Default to 'Pollutant' if none match
+                    });
+                    trace = {
+                        x: xAxisData, 
+                        y: yAxisData, 
+                        mode: 'markers+text',
+                        textposition: 'top center',
+                        type: 'scatter',
+                        text: data.map(point => point.name),
+                        marker: { size:12, color: colorPalette[dataIndex % colorPalette.length] },
+                        name: `Execution ${dataIndex + 1}`
+                    };
+                    traces.push(trace);
+                });
+        
+                // Assuming paretoFront is an array of points similar to dataPoints
+                // And is sorted by 'Cost' for continuity
+                let xAxisDataPF;
+                if (selectXAxis === 'N') {
+                    this.paretoFront.sort((a, b) => a.N - b.N);
+                    xAxisDataPF = this.paretoFront.map(point => point.N);
+                } else if (selectXAxis === 'P') {
+                    this.paretoFront.sort((a, b) => a.P - b.P);
+                    xAxisDataPF = this.paretoFront.map(point => point.P);
+                } else if (selectXAxis === 'S') {
+                    this.paretoFront.sort((a, b) => a.S - b.S);
+                    xAxisDataPF = this.paretoFront.map(point => point.S);
+                } else if (selectXAxis === 'NR') {
+                    this.paretoFront.sort((a, b) => a.NR - b.NR);
+                    xAxisDataPF = this.paretoFront.map(point => point.NR);
+                } else if (selectXAxis === 'PR') {
+                    this.paretoFront.sort((a, b) => a.PR - b.PR);
+                    xAxisDataPF = this.paretoFront.map(point => point.PR);
+                } else if (selectXAxis === 'SR') {
+                    this.paretoFront.sort((a, b) => a.SR - b.SR);
+                    xAxisDataPF = this.paretoFront.map(point => point.SR);
+                } else if (selectXAxis === 'NP') {
+                    this.paretoFront.sort((a, b) => a.NP - b.NP);
+                    xAxisDataPF = this.paretoFront.map(point => point.NP);
+                } else if (selectXAxis === 'PP') {
+                    this.paretoFront.sort((a, b) => a.PP - b.PP);
+                    xAxisDataPF = this.paretoFront.map(point => point.PP);
+                } else if (selectXAxis === 'SP') {
+                    this.paretoFront.sort((a, b) => a.SP - b.SP);
+                    xAxisDataPF = this.paretoFront.map(point => point.SP);
+                } else {
+                    this.paretoFront.sort((a, b) => a.Cost - b.Cost);
+                    xAxisDataPF = this.paretoFront.map(point => point.Cost); // Default case
+                }
+
+                let yAxisDataPF = this.paretoFront.map(point => {
+                    if (selectYAxis === 'N') return point.N;
+                    else if (selectYAxis === 'P') return point.P;
+                    else if (selectYAxis === 'S') return point.S;
+                    else if (selectYAxis === 'NR') return point.NR;
+                    else if (selectYAxis === 'PR') return point.PR;
+                    else if (selectYAxis === 'SR') return point.SR;
+                    else if (selectYAxis === 'NP') return point.NP;
+                    else if (selectYAxis === 'PP') return point.PP;
+                    else if (selectYAxis === 'SP') return point.SP;
+                    else return point.Cost; // Default to 'Pollutant' if none match
+                });
+
+                const paretoTrace = {
+                    x: xAxisDataPF, 
+                    y: yAxisDataPF, 
+                    mode: 'lines',
+                    type: 'scatter',
+                    line: {
+                        color: 'black',
+                        width: 2
+                    },
+                    name: 'Pareto Front'
+                };
+                //traces.push(paretoTrace);
+
+                switch(selectYAxis) {
+                    case 'N':
+                        yAxisTitle = 'Nitrogen (lbs)'; // Replace 'Metric N' with a descriptive name for N
+                        break;
+                    case 'P':
+                        yAxisTitle = 'Phosphorus (lbs)'; // Replace 'Metric P' with a descriptive name for P
+                        break;
+                    case 'S':
+                        yAxisTitle = 'Sediments (lbs)'; // Replace 'Metric S' with a descriptive name for S
+                        break;
+                    case 'NR':
+                        yAxisTitle = 'Nitrogen (lbs)'; // Replace 'Metric N' with a descriptive name for N
+                        break;
+                    case 'PR':
+                        yAxisTitle = 'Phosphorus (lbs)'; // Replace 'Metric P' with a descriptive name for P
+                        break;
+                    case 'SR':
+                        yAxisTitle = 'Sediments (lbs)'; // Replace 'Metric S' with a descriptive name for S
+                        break;
+                    case 'NP':
+                        yAxisTitle = 'Nitrogen (%)'; // Replace 'Metric N' with a descriptive name for N
+                        break;
+                    case 'PP':
+                        yAxisTitle = 'Phosphorus (%)'; // Replace 'Metric P' with a descriptive name for P
+                        break;
+                    case 'SP':
+                        yAxisTitle = 'Sediments (%)'; // Replace 'Metric S' with a descriptive name for S
+                        break;
+                    default:
+                        yAxisTitle = 'Cost (USD $)'; // Default or adjust according to your data
+                        break;
+                }
+                switch(selectXAxis) {
+                    case 'N':
+                        xAxisTitle = 'Nitrogen (lbs)'; // Replace 'Metric N' with a descriptive name for N
+                        break;
+                    case 'P':
+                        xAxisTitle = 'Phosphorus (lbs)'; // Replace 'Metric P' with a descriptive name for P
+                        break;
+                    case 'S':
+                        xAxisTitle = 'Sediments (lbs)'; // Replace 'Metric S' with a descriptive name for S
+                        break;
+                    case 'NR':
+                        xAxisTitle = 'Nitrogen (lbs)'; // Replace 'Metric N' with a descriptive name for N
+                        break;
+                    case 'PR':
+                        xAxisTitle = 'Phosphorus (lbs)'; // Replace 'Metric P' with a descriptive name for P
+                        break;
+                    case 'SR':
+                        xAxisTitle = 'Sediments (lbs)'; // Replace 'Metric S' with a descriptive name for S
+                        break;
+                    case 'NP':
+                        xAxisTitle = 'Nitrogen (%)'; // Replace 'Metric N' with a descriptive name for N
+                        break;
+                    case 'PP':
+                        xAxisTitle = 'Phosphorus (%)'; // Replace 'Metric P' with a descriptive name for P
+                        break;
+                    case 'SP':
+                        xAxisTitle = 'Sediments (%)'; // Replace 'Metric S' with a descriptive name for S
+                        break;
+                    default:
+                        xAxisTitle = 'Cost (USD $)'; // Default or adjust according to your data
+                        break;
+                }
+                layout = {
+                    hovermode: 'closest',
+                    title: 'Pareto Front',
+                    xaxis: {
+                        title: xAxisTitle 
+                    },
+                    yaxis: {
+                        title: yAxisTitle 
+                    },
+                    showlegend: true // Optional: show legend to differentiate instances
+                };
+            }
+            Plotly.newPlot('plot', traces, layout);
+        },
+    };
+}
+function scatterPlotApp2() {
+    return {
+        paretoFront: JSON.parse('{{ pareto_front|safe }}'), // Initial data points
+        dataPoints: JSON.parse('{{ data_points|safe }}'), // Initial data points
+        openModal: false,
+        scenarioId: null, // Initial data points
+        selectedIndices: [], // Tracks selected points by their indices
+        selectedEdge: null, // Initial selected edge
+        selectPlotType: 'scatter', // Default plot type
+        initPlot: function() {
+            this.openModal = false;
+            this.selectedEdge = JSON.parse(document.getElementById('selected-edge').textContent);
+            this.scenarioId = JSON.parse(document.getElementById('scenario-id').textContent);
+            this.plotData(this.dataPoints);
+        },
+        updatePlotType: function() {
+            this.selectPlotType = document.getElementById('selectPlotTypeID').value;
+            this.plotData(this.dataPoints); // Re-plot with the new type
+        },
+        plotData: function(dataSets) {
+            const component = this; // Reference to use inside nested functions
+            const selectPlotType = this.selectPlotType; // Use the component's state
+            const colorPalette = ['blue', 'green', 'orange', 'purple', 'yellow', 'cyan', 'magenta', 'lime', 'pink', 'teal'];
+            let trace, layout;
+            let traces = []; // Array to hold all the trace objects for Plotly
+            if (selectPlotType === 'scatter') {
+                dataSets.forEach((data, dataIndex) => {
+                    trace = {
+                        x: data.map(point => point.Cost),
+                        y: data.map(point => point.Pollutant),
+                        id: data.map(point => point.id),
+                        mode: 'markers+text',
+                        textposition: 'top center',
+                        type: 'scatter',
+                        text: data.map(point => point.name),
+                        marker: { size:12, color: colorPalette[dataIndex % colorPalette.length] },
+                        name: `Execution ${dataIndex + 1}`
+                    };
+                    traces.push(trace);
+                });
+
+                layout = {
+                    hovermode: 'closest',
+                    title: 'Pareto Front',
+                    xaxis: {
+                        title: 'Cost'
+                    },
+                    yaxis: {
+                        title: 'Pollutant'
+                    },
+                    showlegend: true // Optional: show legend to differentiate instances
+
+                };
+                showlegend: true // Optional: show legend to differentiate instances
+            }
+            Plotly.newPlot('plot', traces, layout);
+
+        },
+    };
+}
+window.scatterPlotApp = scatterPlotApp; // Make scatterPlotApp globally available
+</script>
+{% endblock %}
