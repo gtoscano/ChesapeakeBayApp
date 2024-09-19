@@ -62,6 +62,7 @@ geopandas = "*"
 matplotlib-scalebar = "*"
 whitenoise = "*"
 autopep8 = "*"
+exceptiongroup = "*"
 
 [dev-packages]
 

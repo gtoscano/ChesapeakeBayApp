@@ -127,7 +127,7 @@ RUN git clone --recurse-submodules https://github.com/aws/aws-sdk-cpp && \
     git clone https://github.com/graeme-hill/crossguid
 
 WORKDIR /tmp/aws-sdk-cpp 
-RUN cmake /app/data/aws-sdk-cpp -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=/usr/local/  -DBUILD_ONLY="s3" && \
+RUN cmake /app/data/aws-sdk-cpp -DAUTORUN_UNIT_TESTS=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=/usr/local/ -DBUILD_ONLY="s3" && \
     make clean && \
     make && \
     make install
@@ -256,7 +256,7 @@ RUN pipenv install --system --deploy
 #RUN rm /tmp/apache-arrow-apt-source-latest-bullseye.deb
 
 
-COPY variables_standalone.env /root/variables.env
+COPY variables.env /root/variables.env
 
 COPY run_once.sh /root/
 COPY entrypoint_standalone.sh /usr/local/bin/entrypoint.sh
