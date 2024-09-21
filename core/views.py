@@ -8,7 +8,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.http import JsonResponse
 from django.views.generic import RedirectView
-from openai import OpenAI
+#from openai import OpenAI
 from django.contrib.auth.decorators import login_required
 
 from django.views.generic.edit import FormView
@@ -52,7 +52,7 @@ from django.urls import reverse_lazy
 from django.views.generic.edit import DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import BmpCostCustom
-client = OpenAI()
+#client = OpenAI()
 
 
 logger = logging.getLogger(__name__)
