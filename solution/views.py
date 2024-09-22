@@ -43,28 +43,30 @@ from core.models import Bmp, BmpCost, BmpCategory,  BmpType, Agency, Bmp, LoadSr
 import umap.umap_ as umap
 
 
-bmp_dict = None
-load_src_dict =  None
-animal_dict = None
-county_dict = None
-county_dict2 = None
-sector_dict = None
-load_src_sector_dict = None
-lrs_dict = None
+#bmp_dict = None
+#load_src_dict =  None
+#animal_dict = None
+#county_dict = None
+#county_dict2 = None
+#sector_dict = None
+#load_src_sector_dict = None
+#lrs_dict = None
 
 
 def initialize_globals():
-    global bmp_dict, load_src_dict, animal_dict, county_dict, county_dict2, sector_dict, load_src_sector_dict, lrs_dict
-    if bmp_dict is None:
-        #agency_dict = {str(agency.id): agency.name for agency in Agency.objects.all()}
-        #bmp_dict = {str(bmp.id): bmp.name for bmp in Bmp.objects.all()}
-        #load_src_dict = {str(load_src.id): load_src.name for load_src in LoadSrc.objects.all()}
-        #animal_dict = {str(animal.id): animal.name for animal in AnimalGrp.objects.all()}
-        county_dict = {str(county.county): f'{county.name}, {county.state}' for county in GeographicArea.objects.all()}
-        county_dict2 = {str(county.county): f'{county.name}, {county.state}' for county in GeographicArea.objects.all()}
-        sector_dict = {str(sector.id): f'{sector.name}' for sector in Sector.objects.all()}
-        load_src_sector_dict = {str(load_src.id): load_src.sector.name for load_src in LoadSrc.objects.all()}
-        lrs_dict = {str(lrs.id): lrs.name for lrs in LandRiverSegment.objects.all()}
+    pass
+    #global bmp_dict, load_src_dict, animal_dict, county_dict, county_dict2, sector_dict, load_src_sector_dict, lrs_dict
+    #if bmp_dict is None:
+    #    pass
+    #agency_dict = {str(agency.id): agency.name for agency in Agency.objects.all()}
+    #bmp_dict = {str(bmp.id): bmp.name for bmp in Bmp.objects.all()}
+    #load_src_dict = {str(load_src.id): load_src.name for load_src in LoadSrc.objects.all()}
+    #animal_dict = {str(animal.id): animal.name for animal in AnimalGrp.objects.all()}
+    #county_dict = {str(county.county): f'{county.name}, {county.state}' for county in GeographicArea.objects.all()}
+    #county_dict2 = {str(county.county): f'{county.name}, {county.state}' for county in GeographicArea.objects.all()}
+    #sector_dict = {str(sector.id): f'{sector.name}' for sector in Sector.objects.all()}
+    #load_src_sector_dict = {str(load_src.id): load_src.sector.name for load_src in LoadSrc.objects.all()}
+    #lrs_dict = {str(lrs.id): lrs.name for lrs in LandRiverSegment.objects.all()}
     
 
 # Define a simple class to represent a point
@@ -160,7 +162,9 @@ def scatter_plot3(request):
         scenario_data2 = {} 
         sector_names = []
         for load_by_sector in loads_by_sector:
-            sector_name = sector_dict[str(load_by_sector['SectorId'])]
+            #sector_name = sector_dict[str(load_by_sector['SectorId'])]
+            sector_obj = Sector.objects.get(id=load_by_sector['SectorId'])
+            sector_name = sector_obj.name
             sector_names.append(sector_name)
             scenario_data[sector_name]  = {'Cost': int(0.0), 'Eos': {'N': int(load_by_sector['NLoadEos']), 'P': int(load_by_sector['PLoadEos']), 'S': int(load_by_sector['SLoadEos'])}, 'Eor': {'N': int(load_by_sector['NLoadEor']), 'P': int(load_by_sector['PLoadEor']), 'S': int(load_by_sector['SLoadEor'])}, 'Eot': {'N': int(load_by_sector['NLoadEot']), 'P': int(load_by_sector['PLoadEot']), 'S': int(load_by_sector['SLoadEot'])}}
         scenario_data['total2'] = {'Cost': int(float(objectives[0])), 'Eos': {'N': int(100*float(objectives[1])/float(loads['sum_load_total'][0])), 'P': int(float(objectives[2])/float(loads['sum_load_total'][0])), 'S': int(float(objectives[3]))}, 'Eor': {'N': int(float(objectives[4])), 'P': int(float(objectives[5])), 'S': int(float(objectives[6]))}, 'Eot': {'N': int(float(objectives[7])), 'P': int(float(objectives[8])), 'S': int(float(objectives[9]))}} 
@@ -398,7 +402,9 @@ def get_scenario_data(request):
         scenario_data = {} 
         sector_names = []
         for load_by_sector in loads_by_sector:
-            sector_name = sector_dict[str(load_by_sector['SectorId'])]
+            #sector_name = sector_dict[str(load_by_sector['SectorId'])]
+            sector_obj = Sector.objects.get(id=load_by_sector['SectorId'])
+            sector_name = sector_obj.name
             sector_names.append(sector_name)
             scenario_data[sector_name]  = {'Cost': 0.0, 'Eos': {'N': load_by_sector['NLoadEos'], 'P': load_by_sector['PLoadEos'], 'S': load_by_sector['SLoadEos']}, 'Eor': {'N': load_by_sector['NLoadEor'], 'P': load_by_sector['PLoadEor'], 'S': load_by_sector['SLoadEor']}, 'Eot': {'N': load_by_sector['NLoadEot'], 'P': load_by_sector['PLoadEot'], 'S': load_by_sector['SLoadEot']}}
         scenario_data['total'] = {'Cost': float(objectives[0]), 'Eos': {'N': float(objectives[1]), 'P': float(objectives[2]), 'S': float(objectives[3])}, 'Eor': {'N': float(objectives[4]), 'P': float(objectives[5]), 'S': float(objectives[6])}, 'Eot': {'N': float(objectives[7]), 'P': float(objectives[8]), 'S': float(objectives[9])}} 
@@ -435,7 +441,9 @@ class PlotSolutions(LoginRequiredMixin, ListView):
             scenario_data = {} 
             sector_names = []
             for load_by_sector in loads_by_sector:
-                sector_name = sector_dict[str(load_by_sector['SectorId'])]
+                #sector_name = sector_dict[str(load_by_sector['SectorId'])]
+                sector_obj = Sector.objects.get(id=load_by_sector['SectorId'])
+                sector_name = sector_obj.name
                 sector_names.append(sector_name)
                 scenario_data[sector_name]  = {'Cost': 0.0, 'Eos': {'N': load_by_sector['NLoadEos'], 'P': load_by_sector['PLoadEos'], 'S': load_by_sector['SLoadEos']}, 'Eor': {'N': load_by_sector['NLoadEor'], 'P': load_by_sector['PLoadEor'], 'S': load_by_sector['SLoadEor']}, 'Eot': {'N': load_by_sector['NLoadEot'], 'P': load_by_sector['PLoadEot'], 'S': load_by_sector['SLoadEot']}}
             scenario_data['total'] = {'Cost': float(objectives[0]), 'Eos': {'N': objectives[1], 'P': objectives[2], 'S': objectives[3]}, 'Eor': {'N': objectives[4], 'P': objectives[5], 'S': objectives[6]}, 'Eot': {'N': objectives[7], 'P': objectives[8], 'S': objectives[9]}} 
@@ -565,8 +573,9 @@ def get_land_bmps_by_sector_county(land_bmps):
         for key, value in land_bmps.items():
             result_list = key.split("_")
             lrs = result_list[0]
-            sector = load_src_sector_dict[result_list[2]]
-
+            #sector = load_src_sector_dict[result_list[2]]
+            load_src_obj = LoadSrc.objects.get(id=result_list[2])
+            sector = load_src_obj.sector.name
             bmp = Bmp.objects.get(id=result_list[3]).name
             #bmp = bmp_dict[result_list[3]]
             lrs_item =  LandRiverSegment.objects.get(id=lrs)
@@ -619,11 +628,14 @@ def get_bmps_by_sector(land_bmps, animal_bmps, manure_bmps):
 
             load_src = LoadSrc.objects.get(id=result_list[2]).name
             #load_src = load_src_dict[result_list[2]]
-            sector = load_src_sector_dict[result_list[2]]
+            #sector = load_src_sector_dict[result_list[2]]
+            load_src_obj = LoadSrc.objects.get(id=result_list[2])
+            sector = load_src_obj.sector.name
             bmp_id = result_list[3]
             bmp = Bmp.objects.get(id=result_list[3]).name
             #bmp = bmp_dict[result_list[3]]
-            efficiency.append({'id': counter, 'lrs': lrs_dict[lrs], 'agency': agency, 'load_src': load_src, 'sector': sector, 'bmp': bmp, 'amount': value})
+            lrs_obj = LandRiverSegment.objects.get(id=lrs)
+            efficiency.append({'id': counter, 'lrs': lrs_obj.name, 'agency': agency, 'load_src': load_src, 'sector': sector, 'bmp': bmp, 'amount': value})
             # Convert the LRS to a county
             lrs_item =  LandRiverSegment.objects.get(id=lrs)
             if lrs_item.name not in lrs_geo_jsons.keys():
@@ -675,7 +687,9 @@ def get_bmps_by_sector(land_bmps, animal_bmps, manure_bmps):
             #load_src = load_src_dict[load_src_id]
             load_src = LoadSrc.objects.get(id=result_list[2]).name
             sector_id = result_list[2]
-            sector = load_src_sector_dict[sector_id]
+            #sector = load_src_sector_dict[sector_id]
+            load_src_obj = LoadSrc.objects.get(id=result_list[2])
+            sector = load_src_obj.sector.name
             animal_type = AnimalGrp.objects.get(id=result_list[3]).name
             #animal_id = result_list[3]
             #animal_type = animal_dict[animal_id]
@@ -719,12 +733,21 @@ def get_bmps_by_sector(land_bmps, animal_bmps, manure_bmps):
         for key, value in manure_bmps.items():
             result_list = key.split("_")
 
-            county_from= county_dict[result_list[0]]
-            county_to = county_dict[result_list[1]]
+
+            #county_dict = {str(county.county): f'{county.name}, {county.state}' for county in GeographicArea.objects.all()}
+            #county_from= county_dict[result_list[0]]
+            #county_to = county_dict[result_list[1]]
+            county_from_obj = GeographicArea.objects.get(county=result_list[0])
+            county_from = f'{county_from_obj.name}, {county_from_obj.state}'
+
+            county_to_obj = GeographicArea.objects.get(county=result_list[1])
+            county_to = f'{county_to_obj.name}, {county_to_obj.state}'
 
             #load_src = load_src_dict[result_list[2]]
             load_src = LoadSrc.objects.get(id=result_list[2]).name
-            sector = load_src_sector_dict[result_list[2]]
+            #sector = load_src_sector_dict[result_list[2]]
+            load_src_obj = LoadSrc.objects.get(id=result_list[2])
+            sector = load_src_obj.sector.name
 
             animal_type = AnimalGrp.objects.get(id=result_list[3]).name
             #animal_id = animal_dict[result_list[3]]
