@@ -23,17 +23,18 @@ load_dotenv(dotenv_path)
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-DB_NAME = os.environ.get('DB_NAME', 'cast')
 HOST = os.environ.get('HOST', 'localhost')
-DB_HOST = os.environ.get('DB_HOST', 'localhost')
 DB_ENGINE = os.environ.get('DB_ENGINE', 'django.db.backends.postgresql')
-DB_USER = os.environ.get('DB_USER', 'postgres')
-DB_PASSWORD = os.environ.get('DB_PASSWORD', '')
+DB_HOST = os.environ.get('DB_HOST', 'localhost')
+DB_PORT = os.environ.get('DB_PORT', '5432')
+POSTGRES_DB = os.environ.get('POSTGRES_DB', 'cast_db')
+POSTGRES_USER = os.environ.get('POSTGRES_USER', 'postgres')
+POSTGRES_PASSWORD = os.environ.get('POSTGRES_PASSWORD', 'mysecretpassword')
 DJ_DEBUG=  bool(os.environ.get('DJ_DEBUG', 'True'))
 DJ_SECRET_KEY =  os.environ.get('DJ_SECRET_KEY', 'django-insecure-hs6j037urx7iav+7#10%-vu4l4f5@@-1_zo)oft3g8$vf2$jmp')
 
 EMAIL_HOST = os.environ.get('EMAIL_HOST', 'posteo.de')
-EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', 'gtoscano@posteo.net')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
 DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', EMAIL_HOST_USER) 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -189,7 +190,7 @@ WSGI_APPLICATION = 'cast.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-DATABASES = {
+DATABASES2 = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
@@ -199,14 +200,14 @@ DATABASES = {
     }
 }
 
-DATABASES2 = {
+DATABASES = {
     'default': {
         'ENGINE': DB_ENGINE,
-        'NAME': DB_NAME,
-        'USER': DB_USER, 
-        'PASSWORD': DB_PASSWORD,
+        'NAME': POSTGRES_DB,
+        'USER': POSTGRES_USER, 
+        'PASSWORD': POSTGRES_PASSWORD,
         'HOST': DB_HOST,  # Set to the address of your PostgreSQL database
-        'PORT': '5432',       # The default port PostgreSQL listens on
+        'PORT': DB_PORT,       # The default port PostgreSQL listens on
     }
 }
 

@@ -1,37 +1,62 @@
 #!/bin/bash
+set -e
 
-# Apply database migrations
-#sleep 600
-#echo "Copy executers on /usr/bin/"
-#for FILE in optimization/built/scripts/executer/*; do
-#	if [ -f "$FILE" ]; then
-#		echo "$FILE"
-#		chmod +x "$FILE"
-#		cp "$FILE" /usr/bin/
-#	fi
-#done
-#
-#echo "Copy executers on /usr/bin/"
-#for FILE in optimization/built/scripts/services/*; do
-#	if [ -f "$FILE" ]; then
-#		echo "$FILE"
-#		cp "$FILE" /etc/systemd/system/
-#		systemctl enable "${FILE##*/}"
-#		systemctl start "${FILE##*/}" 
-#	fi
-#done
-systemctl --type=service --state=running
-#celery -A api4opt beat --loglevel=info --detach
-#celery -A api4opt worker --loglevel=info
-#python manage.py runserver 0.0.0.0:8000
-echo "Apply database migrations"
-python manage.py makemigrations
-python manage.py migrate
+# Function to print messages in color
+print_message() {
+    local COLOR=$1
+    local MESSAGE=$2
+    case $COLOR in
+        "green")
+            echo -e "\e[32m$MESSAGE\e[0m"
+            ;;
+        "yellow")
+            echo -e "\e[33m$MESSAGE\e[0m"
+            ;;
+        "red")
+            echo -e "\e[31m$MESSAGE\e[0m"
+            ;;
+        *)
+            echo "$MESSAGE"
+            ;;
+    esac
+}
 
-echo "Create superuser"
-python manage.py createsuperuser --noinput --first_name $DJANGO_SUPERUSER_FIRST_NAME --last_name $DJANGO_SUPERUSER_LAST_NAME --username $DJANGO_SUPERUSER_USERNAME --email $DJANGO_SUPERUSER_EMAIL
+# Determine the service type via an environment variable
+case "$SERVICE_TYPE" in
+    "web")
+        print_message "green" "Starting Web Service..."
 
-# Start server
-echo "Starting server"
-python manage.py runserver 0.0.0.0:8000
+        print_message "yellow" "Applying makemigrations..."
+        python manage.py makemigrations
+
+        print_message "yellow" "Applying database migrations..."
+        python manage.py migrate
+
+        print_message "yellow" "Collecting static files..."
+        python manage.py collectstatic --noinput
+
+        print_message "yellow" "Starting server..."
+        python manage.py runserver 0.0.0.0:8000
+        ;;
+
+    "celery")
+        print_message "green" "Starting Celery Worker..."
+        ;;
+
+    "celery-beat")
+        print_message "green" "Starting Celery Beat..."
+        ;;
+
+    "flower")
+        print_message "green" "Starting Flower..."
+        ;;
+
+    *)
+        print_message "red" "Error: SERVICE_TYPE is not set correctly."
+        exit 1
+        ;;
+esac
+
+# Execute the main process
+exec "$@"
 

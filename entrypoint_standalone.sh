@@ -3,13 +3,13 @@
 # Apply database migrations
 #sleep 600
 #export $(cat /root/variables.env | xargs)
-FILE=/root/run_once.sh
-if [ -f "$FILE" ]; then
-   echo "Execute file ${FILE}"
-   bash "${FILE}"
-   echo "Delete file ${FILE}"
-   rm "${FILE}"
-fi
+#FILE=/root/run_once.sh
+#if [ -f "$FILE" ]; then
+#   echo "Execute file ${FILE}"
+#   bash "${FILE}"
+#   echo "Delete file ${FILE}"
+#   rm "${FILE}"
+#fi
 
 
 # Start celery services 

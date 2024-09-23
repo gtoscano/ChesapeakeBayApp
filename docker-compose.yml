@@ -1,71 +1,143 @@
-version: '3.9'
-
 services:
   web:
-    build: .
-    command: ./wait-for-it.sh mysql:3306 -- ./docker-entrypoint.sh
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: ["./wait-for-it.sh", "postgres:5432", "--", "./docker-entrypoint.sh", "gunicorn", "your_project.wsgi:application", "--bind", "0.0.0.0:8000"]
     ports:
-      - 8000:8000
+      - "8000:8000"
     depends_on:
-      - redis
-      - postgres 
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     restart: on-failure
     env_file:
       - variables.env
+    environment:
+      - SERVICE_TYPE=web
+    volumes:
+      - .:/app:delegated
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
-    volumes:
-      - .:/app
-
-  postgres:
-    image: postgres:latest
-    ports:
-      - "5432:5432"  # Map the default PostgreSQL port to the host
-    restart: always
-    volumes:
-      - mypostgresdata:/var/lib/postgresql/data  # Persist database data
-    env_file:
-      - variables.env
-  redis:
-    image: redis:7.0-alpine
-    ports:
-      - 6378:6379
-    restart: always
-    volumes:
-      - myredisdata:/data
   celery:
-    build: .
-    command: celery -A cast worker --loglevel=info
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: ["celery", "-A", "cast", "worker", "--loglevel=info"]
     depends_on:
-      - redis
-    volumes:
-      - .:/app
-    env_file:
-      - variables.env
-  celery-beat:
-    build: .
-    command: celery -A cast beat --loglevel=info
-    depends_on:
-      - redis
-    volumes:
-      - .:/app
-    env_file:
-      - variables.env
-  flower:
-    build: .
-    command: celery -A cast flower
-    depends_on:
-      - web
-      - redis
-      - celery
+      redis:
+        condition: service_healthy
     env_file:
       - variables.env
     environment:
+      - SERVICE_TYPE=celery
+    volumes:
+      - .:/app:delegated
+    networks:
+      - app-network
+    restart: on-failure
+    healthcheck:
+      test: ["CMD", "celery", "-A", "cast", "status"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  celery-beat:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: ["celery", "-A", "cast", "beat", "--loglevel=info"]
+    depends_on:
+      redis:
+        condition: service_healthy
+    env_file:
+      - variables.env
+    environment:
+      - SERVICE_TYPE=celery-beat
+    volumes:
+      - .:/app:delegated
+    networks:
+      - app-network
+    restart: on-failure
+    healthcheck:
+      test: ["CMD", "celery", "-A", "cast", "status"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  flower:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: ["celery", "-A", "cast", "flower"]
+    depends_on:
+      web:
+        condition: service_started
+      redis:
+        condition: service_healthy
+      celery:
+        condition: service_healthy
+    env_file:
+      - variables.env
+    environment:
+      - SERVICE_TYPE=flower
       - DEBUG=1
       - CELERY_BROKER=redis://redis:6379/0
       - CELERY_BACKEND=redis://redis:6379/0
     ports:
-      - 5555:5555
+      - "5555:5555"
+    networks:
+      - app-network
+    restart: on-failure
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5555"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+
+  postgres:
+    image: postgres:14.5  # Specify exact version
+    # Removed ports to enhance security unless host access is required
+    restart: always
+    volumes:
+      - mypostgresdata:/var/lib/postgresql/data
+    env_file:
+      - variables.env
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  redis:
+    image: redis:7.0-alpine
+    # Removed ports to enhance security unless host access is required
+    restart: always
+    volumes:
+      - myredisdata:/data
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
 volumes:
   mypostgresdata:
-  myredisdata:    
+  myredisdata:
+
+networks:
+  app-network:
+    driver: bridge
 

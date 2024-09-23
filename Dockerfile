@@ -259,10 +259,27 @@ RUN pipenv install --system --deploy
 COPY variables.env /root/variables.env
 
 COPY run_once.sh /root/
-COPY entrypoint_standalone.sh /usr/local/bin/entrypoint.sh
-RUN chmod +x /usr/local/bin/entrypoint.sh
+#COPY entrypoint_standalone.sh /usr/local/bin/entrypoint.sh
+#RUN chmod +x /usr/local/bin/entrypoint.sh
 
 # Expose port 8000 on the container
 EXPOSE 8000
-ENTRYPOINT [ "entrypoint.sh" ]
+#ENTRYPOINT [ "entrypoint.sh" ]
+
+
+# ... existing Dockerfile content ...
+
+# Copy the entrypoint script
+COPY docker-entrypoint.sh /app/docker-entrypoint.sh
+
+# Make the entrypoint script executable
+RUN chmod +x /app/docker-entrypoint.sh
+
+# Optionally, you can keep the CMD if needed
+# C#M#D# ["gunicorn", "your_project.wsgi:application", "--bind", "0.0.0.0:8000"]
+
+# Set the entrypoint
+ENTRYPOINT ["/app/docker-entrypoint.sh"]
+
+
 
