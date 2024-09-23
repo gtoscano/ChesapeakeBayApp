@@ -53,21 +53,21 @@ import umap.umap_ as umap
 #lrs_dict = None
 
 
-def initialize_globals():
-    pass
-    #global bmp_dict, load_src_dict, animal_dict, county_dict, county_dict2, sector_dict, load_src_sector_dict, lrs_dict
-    #if bmp_dict is None:
-    #    pass
-    #agency_dict = {str(agency.id): agency.name for agency in Agency.objects.all()}
-    #bmp_dict = {str(bmp.id): bmp.name for bmp in Bmp.objects.all()}
-    #load_src_dict = {str(load_src.id): load_src.name for load_src in LoadSrc.objects.all()}
-    #animal_dict = {str(animal.id): animal.name for animal in AnimalGrp.objects.all()}
-    #county_dict = {str(county.county): f'{county.name}, {county.state}' for county in GeographicArea.objects.all()}
-    #county_dict2 = {str(county.county): f'{county.name}, {county.state}' for county in GeographicArea.objects.all()}
-    #sector_dict = {str(sector.id): f'{sector.name}' for sector in Sector.objects.all()}
-    #load_src_sector_dict = {str(load_src.id): load_src.sector.name for load_src in LoadSrc.objects.all()}
-    #lrs_dict = {str(lrs.id): lrs.name for lrs in LandRiverSegment.objects.all()}
-    
+#def initialize_globals():
+#    pass
+#global bmp_dict, load_src_dict, animal_dict, county_dict, county_dict2, sector_dict, load_src_sector_dict, lrs_dict
+#if bmp_dict is None:
+#    pass
+#agency_dict = {str(agency.id): agency.name for agency in Agency.objects.all()}
+#bmp_dict = {str(bmp.id): bmp.name for bmp in Bmp.objects.all()}
+#load_src_dict = {str(load_src.id): load_src.name for load_src in LoadSrc.objects.all()}
+#animal_dict = {str(animal.id): animal.name for animal in AnimalGrp.objects.all()}
+#county_dict = {str(county.county): f'{county.name}, {county.state}' for county in GeographicArea.objects.all()}
+#county_dict2 = {str(county.county): f'{county.name}, {county.state}' for county in GeographicArea.objects.all()}
+#sector_dict = {str(sector.id): f'{sector.name}' for sector in Sector.objects.all()}
+#load_src_sector_dict = {str(load_src.id): load_src.sector.name for load_src in LoadSrc.objects.all()}
+#lrs_dict = {str(lrs.id): lrs.name for lrs in LandRiverSegment.objects.all()}
+
 
 # Define a simple class to represent a point
 class Point:
@@ -385,7 +385,7 @@ class ListSolutionsHTMX(LoginRequiredMixin, SingleTableMixin, ListView):
             #html = render_to_string('solution/partials/_table.html', context, request=request)
             #return HttpResponse(html)
 def get_scenario_data(request):
-    initialize_globals()
+    #initialize_globals()
     # This is a placeholder for your actual data retrieval logic
     execution_id = 10
     scenario_list = []
@@ -416,7 +416,7 @@ def get_scenario_data(request):
     return JsonResponse(scenario_list, safe=False)  # Return the list of scenarios as JSON
 
 class PlotSolutions(LoginRequiredMixin, ListView):
-    initialize_globals()
+    #initialize_globals()
     model = Solution
     template_name = 'solution/plot_solutions.html'
     paginate_by = 25 
@@ -564,7 +564,7 @@ class PlotySolutions(LoginRequiredMixin, TemplateView):
 
 
 def get_land_bmps_by_sector_county(land_bmps):
-        initialize_globals()
+        #initialize_globals()
         counter = 1
         costs = {}
         efficiency_summary = {}
@@ -612,7 +612,7 @@ def get_land_bmps_by_sector_county(land_bmps):
 
 
 def get_bmps_by_sector(land_bmps, animal_bmps, manure_bmps):
-        initialize_globals()
+        #initialize_globals()
         counter = 1
         efficiency = []
         costs = {}
