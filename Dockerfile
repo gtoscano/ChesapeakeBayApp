@@ -257,9 +257,9 @@ RUN pipenv install --system --deploy
 #RUN rm /tmp/apache-arrow-apt-source-latest-bullseye.deb
 
 
-COPY variables.env /root/variables.env
+#COPY variables.env /root/variables.env
 
-COPY run_once.sh /root/
+#COPY run_once.sh /root/
 #COPY entrypoint_standalone.sh /usr/local/bin/entrypoint.sh
 #RUN chmod +x /usr/local/bin/entrypoint.sh
 
