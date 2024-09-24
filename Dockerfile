@@ -85,10 +85,10 @@ RUN pip install scikit-learn numpy uuid sqlalchemy pyarrow redis
 #WORKDIR /app/data/
 #RUN gzip -d eta.csv.gz
 
-WORKDIR /app/
-COPY ./data/eta.csv.gz /opt/opt4cast/data/
-WORKDIR /opt/opt4cast/data/
-RUN gzip -d eta.csv.gz
+#WORKDIR /app/
+#COPY ./data/eta.csv.gz /opt/opt4cast/data/
+#WORKDIR /opt/opt4cast/data/
+#RUN gzip -d eta.csv.gz
 
 #COPY api api4opt core likes optimization playground plot settings static tags /app/
 #COPY docker-compose.yml docker-entrypoint.sh wait-for-it.sh /app/
@@ -115,6 +115,7 @@ WORKDIR /opt/opt4cast/
 RUN tar xvfz csvs.tar.gz
 
 RUN mkdir -p /tmp/aws-sdk-cpp /tmp/redis-plus-plus /tmp/SimpleAmqpClient /tmp/crossguid
+
 #/tmp/loki-cpp /tmp/curlpp /tmp/c-ares 
 
 ## Install dependencies
@@ -268,6 +269,7 @@ EXPOSE 8000
 
 
 # ... existing Dockerfile content ...
+COPY init_eta.py /app/
 
 # Copy the entrypoint script
 COPY docker-entrypoint.sh /app/docker-entrypoint.sh
@@ -276,7 +278,7 @@ COPY docker-entrypoint.sh /app/docker-entrypoint.sh
 RUN chmod +x /app/docker-entrypoint.sh
 
 # Optionally, you can keep the CMD if needed
-# C#M#D# ["gunicorn", "your_project.wsgi:application", "--bind", "0.0.0.0:8000"]
+# CMD ["gunicorn", "cast.wsgi:application", "--bind", "0.0.0.0:8000"]
 
 # Set the entrypoint
 ENTRYPOINT ["/app/docker-entrypoint.sh"]

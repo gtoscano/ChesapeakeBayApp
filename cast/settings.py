@@ -42,9 +42,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 REDIS_HOST =  os.environ.get('REDIS_HOST','127.0.0.1')
 REDIS_PORT =  os.environ.get('REDIS_PORT', '6379')
-REDIS_DB_CELERY =  os.environ.get('REDIS_DB_CELERY','9')
-REDIS_DB_CELERY =  '9'
-REDIS_DB_CACHE =  os.environ.get('REDIS_DB_CACHE', '8')
+REDIS_DB_CELERY =  os.environ.get('REDIS_DB_CELERY','1')
+REDIS_DB_RESULT=  os.environ.get('REDIS_DB_RESULT','2')
+REDIS_DB_CACHE =  os.environ.get('REDIS_DB_CACHE', '3')
 
 BOKEH_URL = 'https://bokeh.toscano.mx/multiplotall'
 # Quick-start development settings - unsuitable for production
@@ -262,13 +262,14 @@ EMAIL_USE_SSL = True
 EMAIL_PORT = 465
 AUTH_USER_MODEL = 'core.User'
 
-CELERY_BROKER_URL = 'redis://{}:{}/{}'.format(REDIS_HOST, REDIS_PORT, REDIS_DB_CELERY)#192.168.1.31:6379/10'
+CELERY_BROKER_URL = 'redis://{}:{}/{}'.format(REDIS_HOST, REDIS_PORT, REDIS_DB_CELERY)
+CELERY_RESULT_BACKEND= 'redis://{}:{}/{}'.format(REDIS_HOST, REDIS_PORT, REDIS_DB_RESULT)
 
 CACHES = {
 
     'default': {
         'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': 'redis://{}:{}/{}'.format(REDIS_HOST, REDIS_PORT, REDIS_DB_CACHE), #192.168.1.31:6379/20',
+        'LOCATION': 'redis://{}:{}/{}'.format(REDIS_HOST, REDIS_PORT, REDIS_DB_CACHE), 
         #'LOCATION': 'redis://redis:6379/20',
         'TIMEOUT': 10 * 60,
         'OPTIONS': {
@@ -277,7 +278,7 @@ CACHES = {
     },
     "select2": {
         "BACKEND": "django_redis.cache.RedisCache",
-        'LOCATION': 'redis://{}:{}/{}'.format(REDIS_HOST, REDIS_PORT, 2), #192.168.1.31:6379/20',
+        'LOCATION': 'redis://{}:{}/{}'.format(REDIS_HOST, REDIS_PORT, REDIS_DB_CACHE),
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         }
