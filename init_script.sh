@@ -22,8 +22,7 @@ print_message() {
     esac
 }
 
-# if witness file is not present, then run the following command
-if [ ! -f /app/.witness ]; then
+if [ "$RUN_INIT_SCRIPT" = "True" ]; then
         print_message "yellow" "Applying makemigrations..."
         python manage.py makemigrations
 
@@ -46,5 +45,4 @@ if [ ! -f /app/.witness ]; then
         python init_eta.py
 
         print_message "green" "Initialization completed successfully!"
-        touch /app/.witness
 fi
