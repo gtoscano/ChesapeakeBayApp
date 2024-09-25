@@ -27,28 +27,10 @@ case "$SERVICE_TYPE" in
         print_message "green" "Starting Web Service..."
 
         print_message "yellow" "Runing init_script.sh..."
-        bash init_script.sh
 
-        print_message "yellow" "Applying makemigrations..."
-        python manage.py makemigrations
-
-        print_message "yellow" "Applying database migrations..."
-        python manage.py migrate
-
-        print_message "yellow" "Creating Superuser..."
-        python manage.py createsuperuser --noinput --username $DJANGO_SUPERUSER_USERNAME --email $DJANGO_SUPERUSER_EMAIL
-
-        print_message "yellow" "Collecting static files..."
-        python manage.py collectstatic --noinput
-
-
-        print_message "yellow" "Populating Database..."
-        python manage.py runscript load_data
-        python manage.py runscript load_geojsons
-        #python manage.py runscript load_oxygen
-
-        print_message "yellow" "Initializing ETA..."
-        python init_eta.py
+        if [ "$RUN_INIT_SCRIPT" = "True" ]; then
+            bash init_script.sh
+        fi
 
         print_message "yellow" "Starting server..."
         python manage.py runserver 0.0.0.0:8000

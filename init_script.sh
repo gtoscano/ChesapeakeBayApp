@@ -21,28 +21,27 @@ print_message() {
             ;;
     esac
 }
+print_message "green" "Starting Initialization (init_script.sh)!"
 
-if [ "$RUN_INIT_SCRIPT" = "True" ]; then
-        print_message "yellow" "Applying makemigrations..."
-        python manage.py makemigrations
+print_message "yellow" "Applying makemigrations..."
+python manage.py makemigrations
 
-        print_message "yellow" "Applying database migrations..."
-        python manage.py migrate
+print_message "yellow" "Applying database migrations..."
+python manage.py migrate
 
-        print_message "yellow" "Creating Superuser..."
-        python manage.py createsuperuser --noinput --username $DJANGO_SUPERUSER_USERNAME --email $DJANGO_SUPERUSER_EMAIL
+print_message "yellow" "Creating Superuser..."
+python manage.py createsuperuser --noinput --username $DJANGO_SUPERUSER_USERNAME --email $DJANGO_SUPERUSER_EMAIL
 
-        print_message "yellow" "Collecting static files..."
-        python manage.py collectstatic --noinput
+print_message "yellow" "Collecting static files..."
+python manage.py collectstatic --noinput
 
 
-        print_message "yellow" "Populating Database..."
-        python manage.py runscript load_data
-        python manage.py runscript load_geojsons
-        #python manage.py runscript load_oxygen
+print_message "yellow" "Populating Database..."
+python manage.py runscript load_data
+python manage.py runscript load_geojsons
+#python manage.py runscript load_oxygen
 
-        print_message "yellow" "Initializing ETA..."
-        python init_eta.py
+print_message "yellow" "Initializing ETA..."
+python init_eta.py
 
-        print_message "green" "Initialization completed successfully!"
-fi
+print_message "green" "Initialization completed successfully!"

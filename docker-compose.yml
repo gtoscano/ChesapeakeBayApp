@@ -73,7 +73,13 @@ services:
   # Celery Worker Service
   celery:
     image: chesapeake-app:latest
-    command: ["celery", "-A", "cast", "worker", "--loglevel=info"]
+
+    command: >
+      sh -c "
+        ./wait-for-it.sh web:8000 -- 
+        celery -A cast worker --loglevel=info
+      "
+      # command: ["celery", "-A", "cast", "worker", "--loglevel=info"]
     depends_on:
       - redis
       - rabbitmq
