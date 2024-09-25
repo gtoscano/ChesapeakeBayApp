@@ -23,7 +23,8 @@ load_dotenv(dotenv_path)
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-HOST = os.environ.get('HOST', 'localhost')
+HOST_IP = os.environ.get('HOST_IP', 'localhost')
+HOST_NAME = os.environ.get('HOST_NAME', 'www.chesapeakebay.app')
 DB_ENGINE = os.environ.get('DB_ENGINE', 'django.db.backends.postgresql')
 DB_HOST = os.environ.get('DB_HOST', 'localhost')
 DB_PORT = os.environ.get('DB_PORT', '5432')
@@ -58,10 +59,9 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
     '127.0.0.1', 
-    HOST, 
+    HOST_IP, 
     'localhost', 
-    'cast.toscano.mx',
-    'www.chesapeakebay.app',
+    HOST_NAME,
 ]
 
 
@@ -69,9 +69,10 @@ CORS_ORIGIN_WHITELIST = [
     '127.0.0.1:8000',
     'http://localhost:8000',
     'https://localhost:8000',
-    f'http://{HOST}:8000',
-    f'https://{HOST}:8000',
-    'www.chesapeakebay.app',
+    f'http://{HOST_IP}:8000',
+    f'https://{HOST_IP}:8000',
+    f'http://{HOST_NAME}',
+    f'https://{HOST_NAME}',
 ]
 
 
@@ -80,21 +81,21 @@ CORS_ALLOWED_ORIGINS = [
     'https://127.0.0.1:8000',
     'http://localhost:8000',
     'https://localhost:8000',
-    f'http://{HOST}:8000',
-    f'https://{HOST}:8000',
-    'http://www.chesapeakebay.app',
-    'https://www.chesapeakebay.app',
+    f'http://{HOST_IP}:8000',
+    f'https://{HOST_IP}:8000',
+    f'http://{HOST_NAME}',
+    f'https://{HOST_NAME}',
 ]
 
 CSRF_TRUSTED_ORIGINS = [
     'http://127.0.0.1:8000',
     'https://127.0.0.1:8000',
-    f'http://{HOST}:8000',
-    f'https://{HOST}:8000',
+    f'http://{HOST_IP}:8000',
+    f'https://{HOST_IP}:8000',
     'http://localhost:8000',
     'https://localhost:8000',
-    'http://www.chesapeakebay.app',
-    'https://www.chesapeakebay.app',
+    f'http://{HOST_NAME}',
+    f'https://{HOST_NAME}',
 ]
 
 

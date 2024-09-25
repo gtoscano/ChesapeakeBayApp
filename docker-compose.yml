@@ -129,7 +129,7 @@ services:
       - SERVICE_TYPE=flower
       - DEBUG=1
       - CELERY_BROKER=redis://redis:6379/1
-      - CELERY_BACKEND=redis://redis:6379/2
+      - CELERY_BACKEND=redis://redis:6379/1
     ports:
       - "5555:5555"
     volumes:
@@ -150,10 +150,6 @@ services:
       - mypostgresdata:/var/lib/postgresql/data
     env_file:
       - variables.env
-    environment:
-      - POSTGRES_DB=${POSTGRES_DB}
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     networks:
       - app-network
     healthcheck:
@@ -169,9 +165,6 @@ services:
       - "15672:15672"  # Management UI port
       # - "5672:5672"  # Uncomment if external AMQP access is needed
     restart: always
-    environment:
-      - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER:-guest}
-      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS:-guest}
     env_file:
       - variables.env
     volumes:
