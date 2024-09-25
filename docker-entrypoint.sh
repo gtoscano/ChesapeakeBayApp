@@ -51,6 +51,13 @@ case "$SERVICE_TYPE" in
         python manage.py runserver 0.0.0.0:8000
         ;;
 
+    "alfred_retrieve")
+        print_message "green" "Starting Alfred Retrieve..."
+        ;;
+
+    "alfred_send")
+        print_message "green" "Starting Alfred Send..."
+        ;;
     "celery")
         print_message "green" "Starting Celery Worker..."
         ;;

@@ -19,6 +19,7 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 import debug_toolbar
+from .views import health_check
 
 
 urlpatterns = [
@@ -43,6 +44,7 @@ urlpatterns = [
     path('auth/', include('djoser.urls')),
     path('auth/', include('djoser.urls.jwt')),
     path('__debug__/', include(debug_toolbar.urls)),
+    path('health/', health_check, name='health_check'),
 ]
 
 # ... your other url patterns

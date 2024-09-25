@@ -43,7 +43,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 REDIS_HOST =  os.environ.get('REDIS_HOST','127.0.0.1')
 REDIS_PORT =  os.environ.get('REDIS_PORT', '6379')
 REDIS_DB_CELERY =  os.environ.get('REDIS_DB_CELERY','1')
-REDIS_DB_RESULT=  os.environ.get('REDIS_DB_RESULT','2')
+REDIS_DB_RESULT=  os.environ.get('REDIS_DB_RESULT','1')
 REDIS_DB_CACHE =  os.environ.get('REDIS_DB_CACHE', '3')
 
 BOKEH_URL = 'https://bokeh.toscano.mx/multiplotall'
@@ -56,19 +56,51 @@ SECRET_KEY = 'django-insecure-2ooy(!-px2q711qm#ivj7g8v+7*7e+j(xp9%ub$&@bk)x$9v6s
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', HOST, 'localhost', 'cast.toscano.mx','www.chesapeakebay.app','192.168.1.3' ]
+ALLOWED_HOSTS = [
+    '127.0.0.1', 
+    HOST, 
+    'localhost', 
+    'cast.toscano.mx',
+    'www.chesapeakebay.app',
+]
 
-CSRF_TRUSTED_ORIGINS = ['http://127.0.0.1:8080', r'http://{HOST}:8080', 'http://localhost:8080', 'https://cast.toscano.mx', 'https://www.chesapeakebay.app', 'http://192.168.1.3:8080']
 
-CORS_ORIGIN_WHITELIST = ['127.0.0.1:8080', 'http://localhost:8080', r'http://{HOST}:8080',
-                         'cast.toscano.mx','wwww.chesapeakebay.app', '192.168.1.3:8080'
-                         ]
+CORS_ORIGIN_WHITELIST = [
+    '127.0.0.1:8000',
+    'http://localhost:8000',
+    'https://localhost:8000',
+    f'http://{HOST}:8000',
+    f'https://{HOST}:8000',
+    'www.chesapeakebay.app',
+    '192.168.1.3:8000',
+]
 
-CORS_ALLOWED_ORIGINS = [ 'https://127.0.0.1:8080', 'https://localhost:8080', r'http://{HOST}:8080',
-                                                           'https://cast.toscano.mx','https://wwww.chesapeakebay.app', 'https://192.168.1.3:8080'
-                         ]
+
+CORS_ALLOWED_ORIGINS = [
+    'http://127.0.0.1:8000',
+    'https://127.0.0.1:8000',
+    'http://localhost:8000',
+    'https://localhost:8000',
+    f'http://{HOST}:8000',
+    f'https://{HOST}:8000',
+    'http://www.chesapeakebay.app',
+    'https://www.chesapeakebay.app',
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    'http://127.0.0.1:8000',
+    'https://127.0.0.1:8000',
+    f'http://{HOST}:8000',
+    f'https://{HOST}:8000',
+    'http://localhost:8000',
+    'https://localhost:8000',
+    'http://www.chesapeakebay.app',
+    'https://www.chesapeakebay.app',
+]
+
+
 SITE_ID = 1 
-SECURE_SSL_REDIRECT = True
+SECURE_SSL_REDIRECT = os.environ.get('SECURE_SSL_REDIRECT', 'False') == 'True'
 ##CSRF_COOKIE_SECURE = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 # Application definition
@@ -121,13 +153,12 @@ INSTALLED_APPS = [
     'templatetags',
     'sslserver'
 ]
-CRISPY_ALLOWED_TEMPLATE_PACKS = "daisyui"
-CRISPY_ALLOWED_TEMPLATE_PACKS = "tailwind"
-CRISPY_ALLOWED_TEMPLATE_PACKS = "bulma"
-CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
-CRISPY_TEMPLATE_PACK = "daisyui"
-CRISPY_TEMPLATE_PACK = "bulma"
-CRISPY_TEMPLATE_PACK = "tailwind"
+CRISPY_ALLOWED_TEMPLATE_PACKS = [
+    "daisyui",
+    "tailwind",
+    "bulma",
+    "bootstrap5",
+]
 CRISPY_TEMPLATE_PACK = "bootstrap5"
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
@@ -142,9 +173,6 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',
 ]
-
-
-CSRF_TRUSTED_ORIGINS = ['https://opt4cast.toscano.mx', 'https://api.toscano.mx']
 
 
 ROOT_URLCONF = 'cast.urls'

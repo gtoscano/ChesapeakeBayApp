@@ -2,10 +2,11 @@
 data-lfs/
 media/*
 logs/*
-*.env
 
 __pycache__/
 *.py[cod]
+*.db
+*.env
 *$py.class
 
 # C extensions
