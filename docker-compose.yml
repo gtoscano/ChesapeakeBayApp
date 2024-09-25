@@ -102,7 +102,14 @@ services:
   # Celery Beat Service
   celery-beat:
     image: chesapeake-app:latest
-    command: ["celery", "-A", "cast", "beat", "--loglevel=info"]
+
+    command: >
+      sh -c "
+        ./wait-for-it.sh web:8000 -- 
+        celery -A cast beat --loglevel=info
+      "
+      # command: ["celery", "-A", "cast", "worker", "--loglevel=info"]
+      #command: ["celery", "-A", "cast", "beat", "--loglevel=info"]
     depends_on:
       - redis
       - rabbitmq
@@ -125,7 +132,14 @@ services:
   # Flower Service for monitoring Celery
   flower:
     image: chesapeake-app:latest
-    command: ["celery", "-A", "cast", "flower"]
+    command: >
+      sh -c "
+        ./wait-for-it.sh web:8000 -- 
+        celery -A cast flower --loglevel=info
+      "
+      # command: ["celery", "-A", "cast", "worker", "--loglevel=info"]
+      # command: ["celery", "-A", "cast", "beat", "--loglevel=info"]
+      # command: ["celery", "-A", "cast", "flower"]
     depends_on:
       - rabbitmq
       - web
