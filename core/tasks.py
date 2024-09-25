@@ -18,26 +18,30 @@ from os.path import basename
 from zipfile import ZipFile
 import zipfile
 
+@shared_task
+def add(x, y):
+    return x + y
+
 # Global variables initialized to None
-agency_dict = None
-bmp_dict = None
-load_src_dict = None
-animal_dict = None
-county_dict = None
-sector_dict = None
-load_src_sector_dict = None
-lrs_dict = None
-def initialize_globals():
-    global agency_dict, bmp_dict, load_src_dict, animal_dict, county_dict, sector_dict, load_src_sector_dict, lrs_dict
-    if agency_dict is None:
-        agency_dict = {str(agency.id): agency.name for agency in Agency.objects.all()}
-        bmp_dict = {str(bmp.id): bmp.name for bmp in Bmp.objects.all()}
-        load_src_dict = {str(load_src.id): load_src.name for load_src in LoadSrc.objects.all()}
-        animal_dict = {str(animal.id): animal.name for animal in AnimalGrp.objects.all()}
-        county_dict = {str(county.county): f'{county.name}, {county.state}' for county in GeographicArea.objects.all()}
-        sector_dict = {str(sector.id): f'{sector.name}' for sector in Sector.objects.all()}
-        load_src_sector_dict = {str(load_src.id): load_src.sector.name for load_src in LoadSrc.objects.all()}
-        lrs_dict = {str(lrs.id): lrs.name for lrs in LandRiverSegment.objects.all()}
+#agency_dict = None
+#bmp_dict = None
+#load_src_dict = None
+#animal_dict = None
+#county_dict = None
+#sector_dict = None
+#load_src_sector_dict = None
+#lrs_dict = None
+#def initialize_globals():
+#    global agency_dict, bmp_dict, load_src_dict, animal_dict, county_dict, sector_dict, load_src_sector_dict, lrs_dict
+#    if agency_dict is None:
+#        #agency_dict = {str(agency.id): agency.name for agency in Agency.objects.all()}
+#        #bmp_dict = {str(bmp.id): bmp.name for bmp in Bmp.objects.all()}
+#        #load_src_dict = {str(load_src.id): load_src.name for load_src in LoadSrc.objects.all()}
+#        #animal_dict = {str(animal.id): animal.name for animal in AnimalGrp.objects.all()}
+#        #county_dict = {str(county.county): f'{county.name}, {county.state}' for county in GeographicArea.objects.all()}
+#        #sector_dict = {str(sector.id): f'{sector.name}' for sector in Sector.objects.all()}
+#        #load_src_sector_dict = {str(load_src.id): load_src.sector.name for load_src in LoadSrc.objects.all()}
+#        #lrs_dict = {str(lrs.id): lrs.name for lrs in LandRiverSegment.objects.all()}
 
 #OPT4CAST_RUN_BASE_SIMPLE_PATH = os.environ.get('OPT4CAST_RUN_BASE_SIMPLE_PATH', '/app/optimization/run_base/build/run_base')
 
@@ -86,7 +90,7 @@ def zipit(directory, zip_filename, prefix='/results/'):
 @shared_task
 def send_base_scenarios():
 
-    initialize_globals()
+    #initialize_globals()
     #failed_scenarios = BaseScenario.objects.filter(status=BaseScenario.STATUS_FAILED)
     failed_or_pending_scenarios = BaseScenario.objects.filter(status='F')
     for scenario in failed_or_pending_scenarios:
@@ -247,7 +251,7 @@ def make_base_scenario_init_file(base_scenario_id):
 @shared_task
 def process_new_base_scenario(base_scenario_id):
 
-    initialize_globals()
+    #initialize_globals()
     run_base_scenario(base_scenario_id)
     make_base_scenario_init_file(base_scenario_id)
 
@@ -258,7 +262,7 @@ OPT4CAST_RUN_NSGA_PATH = os.environ.get('OPT4CAST_RUN_NSGA_PATH', '/home/gtoscan
 
 @shared_task
 def process_new_optimization(scenario_id):
-    initialize_globals()
+    #initialize_globals()
     uuid=uuid4()
     niterations = 20 
     print('inside of process new optimization: ', uuid)
@@ -458,19 +462,28 @@ def get_land_bmps_by_sector_lrs(land_bmps):
             result_list = key.split("_")
             lrs = result_list[0]
             agency_id = result_list[1]
-            agency = agency_dict[agency_id]
+            #agency_dict = {str(agency.id): agency.name for agency in Agency.objects.all()}
+            #agency = agency_dict[agency_id]
+            agency = Agency.objects.get(id=agency_id).name
             load_id = result_list[2]
-            load_src = load_src_dict[load_id]
-            sector = load_src_sector_dict[result_list[2]]
+
+            #load_src_dict = {str(load_src.id): load_src.name for load_src in LoadSrc.objects.all()}
+            #load_src = load_src_dict[load_id]
+            load_src = LoadSrc.objects.get(id=load_id).name
+            #sector = load_src_sector_dict[result_list[2]]
+            sector = LoadSrc.objects.get(id=result_list[2]).sector.name
             bmp_id = result_list[3]
-            bmp = bmp_dict[bmp_id]
+
+            #bmp_dict = {str(bmp.id): bmp.name for bmp in Bmp.objects.all()}
+            #bmp = bmp_dict[bmp_id]
+            bmp = Bmp.objects.get(id=bmp_id).name
             lrs_item =  LandRiverSegment.objects.get(id=lrs)
             state_abbr = lrs_item.geographic_area.state
             state_id = State.objects.get(abbreviation=state_abbr.lower()).id
             price = float(BmpCost.objects.filter(Q(state__id=state_id), Q(bmp__id=bmp_id)).first().cost)
             cost = price * value
 
-            efficiency.append({'state_id': int(state_id), 'state': state_abbr, 'county_id': lrs_item.geographic_area.id, 'county': lrs_item.geographic_area.name,  'lrs_id': int(lrs), 'lrs': lrs_dict[lrs], 'agency_id': int(agency_id), 'agency': agency,  'load_src_id': int(load_id), 'load_src': load_src, 'sector': sector, 'bmp_id': int(bmp_id), 'bmp': bmp, 'acres': value, 'price': price, 'cost': cost})
+            efficiency.append({'state_id': int(state_id), 'state': state_abbr, 'county_id': lrs_item.geographic_area.id, 'county': lrs_item.geographic_area.name,  'lrs_id': int(lrs), 'lrs': LandRiverSegment.objects.get(id=lrs).name, 'agency_id': int(agency_id), 'agency': agency,  'load_src_id': int(load_id), 'load_src': load_src, 'sector': sector, 'bmp_id': int(bmp_id), 'bmp': bmp, 'acres': value, 'price': price, 'cost': cost})
 
         df = pd.DataFrame(efficiency)
         df['state_id'] = df['state_id'].astype('Int8')  # Use 'Int32', 'Int16', or 'Int8' as needed
@@ -500,10 +513,13 @@ def get_animal_bmps_by_sector_lrs(animal_bmps):
             #county2 = county_dict[result_list[1]]
             #print(county2)
             load_src_id = result_list[2]
-            load_src = load_src_dict[load_src_id]
-            sector = load_src_sector_dict[load_src_id]
+            #load_src = load_src_dict[load_src_id]
+            load_src = LoadSrc.objects.get(id=load_src_id).name
+            #sector = load_src_sector_dict[load_src_id]
+            sector = LoadSrc.objects.get(id=load_src_id).sector.name
             animal_id = result_list[3]
-            animal_name = animal_dict[animal_id]
+            #animal_name = animal_dict[animal_id]
+            animal_name = AnimalGrp.objects.get(id=animal_id).name
             bmp_id = result_list[4]
             bmp = bmp_dict[bmp_id]
             price = float(BmpCost.objects.filter(Q(state__id=state_id), Q(bmp__id=bmp_id)).first().cost)
@@ -540,10 +556,15 @@ def get_manure_bmps_by_sector_lrs(manure_bmps):
             state_id = State.objects.get(abbreviation=state_abbr.lower()).id
             #county2 = county_dict[result_list[1]]
             #print(county2)
-            load_src = load_src_dict[load_src_id]
-            sector = load_src_sector_dict[load_src_id]
-            animal_name = animal_dict[animal_id]
-            bmp = bmp_dict[bmp_id]
+            #load_src = load_src_dict[load_src_id]
+            load_src = LoadSrc.objects.get(id=load_src_id).name
+            #sector = load_src_sector_dict[load_src_id]
+            sector = LoadSrc.objects.get(id=load_src_id).sector.name
+
+            #animal_name = animal_dict[animal_id]
+            animal_name = AnimalGrp.objects.get(id=animal_id).name
+            #bmp = bmp_dict[bmp_id]
+            bmp = Bmp.objects.get(id=bmp_id).name
             price = float(BmpCost.objects.filter(Q(state__id=state_id), Q(bmp__id=bmp_id)).first().cost)
             cost = price * value
             manure.append({'id': counter, 'state_id': state_id, 'state': state_abbr, 'county_from_id': county_from_id, 'county_from': county_from, 'county_to_id': county_to_id,  'county_to': county_to, 'load_src_id': load_src_id, 'load_src': load_src, 'sector': sector, 'animal_id': animal_id, 'animal': animal_name, 'bmp_id': bmp_id, 'bmp': bmp, 'amount': value, 'price': price, 'cost': cost})
@@ -737,12 +758,13 @@ def retrieve_optimization_solutions(execution_id, prefix, config_path):
 
         total = {'Cost': float(objectives[0]), 'EOS': {'N': float(objectives[1]), 'P': float(objectives[2]), 'S': float(objectives[3])}, 'EOR': {'N': float(objectives[4]), 'P': float(objectives[5]), 'S': float(objectives[6])}, 'EOT': {'N': float(objectives[7]), 'P': float(objectives[8]), 'S': float(objectives[9])}} 
 
-        sector_dict = {str(sector.id): f'{sector.name}' for sector in Sector.objects.all()}
+        #sector_dict = {str(sector.id): f'{sector.name}' for sector in Sector.objects.all()}
         sector_names = [sector.name for sector in Sector.objects.all()]
         loads_dict = {}
 
         for index, loads in loads_by_sector.iterrows():
-            sector_name = sector_dict[str(int(loads['SectorId']))]
+            #sector_name = sector_dict[str(int(loads['SectorId']))]
+            sector_name = Sector.objects.get(id=int(loads['SectorId'])).name
             loads_dict[sector_name]  = {'Cost': float(0.0), 'EOS': {'N': float(loads['NLoadEos']), 'P': float(loads['PLoadEos']), 'S': float(loads['SLoadEos'])}, 'EOR': {'N': float(loads['NLoadEor']), 'P': float(loads['PLoadEor']), 'S': float(loads['SLoadEor'])}, 'EOT': {'N': float(loads['NLoadEot']), 'P': float(loads['PLoadEot']), 'S': float(loads['SLoadEot'])}}
         loads_dict['Total'] = total
 

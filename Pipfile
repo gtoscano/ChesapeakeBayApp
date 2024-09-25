@@ -64,6 +64,8 @@ whitenoise = "*"
 autopep8 = "*"
 exceptiongroup = "*"
 flower = "*"
+django-celery-beat = "*"
+django-celery-results = "*"
 
 [dev-packages]
 

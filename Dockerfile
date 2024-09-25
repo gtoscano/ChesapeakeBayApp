@@ -37,12 +37,18 @@ RUN apt-get -y install apt-utils locales-all locales wget
 RUN locale-gen en_US.UTF-8
 RUN dpkg-reconfigure --frontend noninteractive tzdata
 
-RUN mkdir -p /app /app/media /app/log /app/ /opt/opt4cast/output/parquet /app/data /opt/opt4cast/data /opt/opt4cast/output/nsga3
+RUN mkdir -p /app \
+    /app_src /app_src/github /app_src/data /app_src/ipopt \
+    /app_src/CastEvaluation /app_src/alfred/ /app_src/MSUCast/ /app_src/run_base/ \
+    /app_src/aws-sdk-cpp /app_src/redis-plus-plus /app_src/SimpleAmqpClient /app_src/crossguid \
+    /opt/opt4cast/output/parquet /opt/opt4cast/data /opt/opt4cast/output/nsga3
+
+
 
 WORKDIR /app/
 COPY . ./
-COPY data/ /app/data/
-COPY data/check.py /usr/local/bin
+#COPY data/ /app/data/
+#COPY data/check.py /usr/local/bin
 
 #WORKDIR /app/data/
 #RUN wget https://www.dropbox.com/s/k74cctt8fgue9ko/dependencies.tar.gz && tar xvfz dependencies.tar.gz && rm dependencies.tar.gz
@@ -51,7 +57,7 @@ COPY data/check.py /usr/local/bin
 
 
 #WORKDIR /app/data/dependencies/
-WORKDIR /app/data/
+WORKDIR /app_src/data/
 RUN wget -O apache-arrow-apt-source-latest-bullseye.deb https://apache.jfrog.io/artifactory/arrow/debian/apache-arrow-apt-source-latest-bullseye.deb
 RUN dpkg -i apache-arrow-apt-source-latest-bullseye.deb
 #COPY data/install.sh /tmp
@@ -114,39 +120,38 @@ COPY data/csvs.tar.gz /opt/opt4cast/
 WORKDIR /opt/opt4cast/
 RUN tar xvfz csvs.tar.gz
 
-RUN mkdir -p /tmp/aws-sdk-cpp /tmp/redis-plus-plus /tmp/SimpleAmqpClient /tmp/crossguid
 
 #/tmp/loki-cpp /tmp/curlpp /tmp/c-ares 
 
 ## Install dependencies
 
 
-WORKDIR /app/data/
+WORKDIR /app_src/github/
 RUN git clone --recurse-submodules https://github.com/aws/aws-sdk-cpp && \
     git clone https://github.com/sewenew/redis-plus-plus.git && \
     git clone https://github.com/alanxz/SimpleAmqpClient.git && \
     git clone https://github.com/graeme-hill/crossguid
 
-WORKDIR /tmp/aws-sdk-cpp 
-RUN cmake /app/data/aws-sdk-cpp -DAUTORUN_UNIT_TESTS=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=/usr/local/ -DBUILD_ONLY="s3" && \
+WORKDIR /app_src/aws-sdk-cpp 
+RUN cmake /app_src/github/aws-sdk-cpp -DAUTORUN_UNIT_TESTS=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=/usr/local/ -DBUILD_ONLY="s3" && \
     make clean && \
     make && \
     make install
 
-WORKDIR /tmp/redis-plus-plus 
-RUN cmake -DREDIS_PLUS_PLUS_CXX_STANDARD=17 /app/data/redis-plus-plus/ -DCMAKE_BUILD_TYPE=Release && \
+WORKDIR /app_src/redis-plus-plus 
+RUN cmake -DREDIS_PLUS_PLUS_CXX_STANDARD=17 /app_src/github/redis-plus-plus/ -DCMAKE_BUILD_TYPE=Release && \
     make clean && \
     make && \
     make install
 
-WORKDIR /tmp/SimpleAmqpClient
-RUN cmake /app/data/SimpleAmqpClient -DCMAKE_BUILD_TYPE=Release && \
+WORKDIR /app_src/SimpleAmqpClient
+RUN cmake /app_src/github/SimpleAmqpClient -DCMAKE_BUILD_TYPE=Release && \
     make clean && \
     make && \
     make install
 
-WORKDIR /tmp/crossguid 
-RUN cmake /app/data/crossguid -DCMAKE_BUILD_TYPE=Release && \
+WORKDIR /app_src/crossguid 
+RUN cmake /app_src/github/crossguid -DCMAKE_BUILD_TYPE=Release && \
     make clean && \
     make && \
     make install
@@ -154,29 +159,29 @@ RUN cmake /app/data/crossguid -DCMAKE_BUILD_TYPE=Release && \
 
 
 ## Install COIN Operation Research Tools
-WORKDIR /app/optimization/ipopt/
+WORKDIR /app_src/ipopt/
 RUN git clone https://github.com/coin-or-tools/ThirdParty-ASL.git && \
     git clone https://github.com/coin-or-tools/ThirdParty-HSL.git && \
     git clone https://github.com/coin-or-tools/ThirdParty-Mumps.git && \
     git clone https://github.com/coin-or/Ipopt.git
 
-COPY data/solvers.tar.gz /app/optimization/ipopt/ThirdParty-ASL/
-WORKDIR /app/optimization/ipopt/ThirdParty-ASL
+COPY data/solvers.tar.gz /app_src/ipopt/ThirdParty-ASL/
+WORKDIR /app_src/ipopt/ThirdParty-ASL
 RUN tar xvfz solvers.tar.gz && \
     ./configure && \
     make clean && \
     make && \
     make install 
 
-COPY data/coinhsl.tar.gz /app/optimization/ipopt/ThirdParty-HSL/
-WORKDIR /app/optimization/ipopt/ThirdParty-HSL
+COPY data/coinhsl.tar.gz /app_src/ipopt/ThirdParty-HSL/
+WORKDIR /app_src/ipopt/ThirdParty-HSL
 RUN tar xvfz coinhsl.tar.gz && \
     ./configure && \
     make clean && \
     make && \
     make install 
 
-WORKDIR /app/optimization/ipopt/ThirdParty-Mumps
+WORKDIR /app_src/ipopt/ThirdParty-Mumps
 RUN chmod +x get.Mumps && \
     ./get.Mumps && \
     ./configure && \
@@ -185,46 +190,46 @@ RUN chmod +x get.Mumps && \
     make install 
 
 
-WORKDIR /app/optimization/ipopt/Ipopt
-RUN ./configure && make clean && make && make install 
+WORKDIR /app_src/ipopt/Ipopt
+RUN ./configure && \
+    make clean && \
+    make && \
+    make install 
 
-WORKDIR /app/
+WORKDIR /app_src/github/
 RUN git clone https://github.com/gtoscano/CastEvaluation.git && \
     git clone https://github.com/gtoscano/alfred.git && \
     git clone https://github.com/gtoscano/MSUCast.git && \
     git clone https://github.com/gtoscano/run_base
 
-RUN mkdir -p /app/CastEvaluation/build /app/alfred/build /app/MSUCast/build /app/run_base/build
 
-WORKDIR /app/CastEvaluation/build
-RUN cmake .. && \
+WORKDIR /app_src/CastEvaluation
+RUN cmake /app_src/github/CastEvaluation && \
     make clean && \
     make && \
     make install 
 
-WORKDIR /app/alfred/build
-RUN cmake .. && \
+WORKDIR /app_src/alfred
+RUN cmake /app_src/github/alfred&& \
     make clean && \
     make && \
     make install
 
 
-WORKDIR /app/MSUCast/build
-RUN cmake .. && \
+WORKDIR /app_src/MSUCast
+RUN cmake /app_src/github/MSUCast && \
     make clean && \
     make && \
     make install
 
-WORKDIR /app/run_base/build
-RUN cmake .. && \
+WORKDIR /app_src/run_base
+RUN cmake /app_src/github/run_base && \
     make clean && \
     make && \
     make install
 
-#&& cd build && cmake .. && make clean && make && make install
 
-
-RUN rm -rf /app/data/ipopt /tmp/aws-sdk-cpp /tmp/redis-plus-plus /tmp/SimpleAmqpClient /tmp/crossguid 
+# RUN rm -rf /app_src/github/ipopt /app_src/aws-sdk-cpp /app_src/redis-plus-plus /app_src/SimpleAmqpClient /app_src/crossguid 
 # /tmp/loki-cpp /tmp/curlpp /tmp/crossguid /tmp/c-ares 
 #RUN chown -R www-data.www-data csvs
 
@@ -269,10 +274,10 @@ EXPOSE 8000
 
 
 # ... existing Dockerfile content ...
-COPY init_eta.py /app/
+#COPY init_eta.py /app/
 
 # Copy the entrypoint script
-COPY docker-entrypoint.sh /app/docker-entrypoint.sh
+#COPY docker-entrypoint.sh /app/docker-entrypoint.sh
 
 # Make the entrypoint script executable
 RUN chmod +x /app/docker-entrypoint.sh
