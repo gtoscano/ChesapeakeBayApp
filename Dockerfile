@@ -47,22 +47,10 @@ RUN mkdir -p /app \
 
 WORKDIR /app/
 COPY . ./
-#COPY data/ /app/data/
-#COPY data/check.py /usr/local/bin
 
-#WORKDIR /app/data/
-#RUN wget https://www.dropbox.com/s/k74cctt8fgue9ko/dependencies.tar.gz && tar xvfz dependencies.tar.gz && rm dependencies.tar.gz
-#RUN tar xvfz ipopt.tar.gz && rm ipopt.tar.gz
-
-
-
-#WORKDIR /app/data/dependencies/
 WORKDIR /app_src/data/
 RUN wget -O apache-arrow-apt-source-latest-bullseye.deb https://apache.jfrog.io/artifactory/arrow/debian/apache-arrow-apt-source-latest-bullseye.deb
 RUN dpkg -i apache-arrow-apt-source-latest-bullseye.deb
-#COPY data/install.sh /tmp
-#RUN chmod +x /tmp/install.sh
-#RUN bash /tmp/install.sh
 RUN apt-get update -y && apt-get upgrade -y
 RUN apt-get install -y gcc g++ gfortran cmake git patch pkg-config liblapack-dev \
     libmetis-dev gawk build-essential cmake ninja-build bazel-bootstrap  \
@@ -76,38 +64,9 @@ RUN apt-get install -y gcc g++ gfortran cmake git patch pkg-config liblapack-dev
     libcjson1 libcjson-dev redis software-properties-common apt-transport-https \
     gnupg2 libcurlpp0 libcurlpp-dev libc-ares-dev libc-ares2 librange-v3-dev
 
-#COPY data/mysql.service /lib/systemd/system/
-
-#RUN systemctl enable rabbitmq-server &&  systemctl enable redis-server && rabbitmq-plugins enable rabbitmq_management 
-#&& systemctl enable mysql
 RUN pip install scikit-learn numpy uuid sqlalchemy pyarrow redis
 
 
-# Must start: systemctl start mysqld
-
-
-#WORKDIR /app/plot
-#RUN gzip -d Chesapeake_Bay_Watershed_Model_Phase_6_Land_River_Segments.geojson.gz
-#WORKDIR /app/data/
-#RUN gzip -d eta.csv.gz
-
-#WORKDIR /app/
-#COPY ./data/eta.csv.gz /opt/opt4cast/data/
-#WORKDIR /opt/opt4cast/data/
-#RUN gzip -d eta.csv.gz
-
-#COPY api api4opt core likes optimization playground plot settings static tags /app/
-#COPY docker-compose.yml docker-entrypoint.sh wait-for-it.sh /app/
-#COPY Pipfile Pipfile.lock requirements.txt /app/
-
-
-# We use the --system flag so packages are installed into the system python
-# and not into a virtualenv. Docker containers don't need virtual environments. 
-
-
-#RUN chown -R www-data:www-data /home/www-data/web2py
-
-## CREATE the output directories
 RUN chown -R www-data.www-data /opt/opt4cast/output
 
 
@@ -229,22 +188,9 @@ RUN cmake /app_src/github/run_base && \
     make install
 
 
-# RUN rm -rf /app_src/github/ipopt /app_src/aws-sdk-cpp /app_src/redis-plus-plus /app_src/SimpleAmqpClient /app_src/crossguid 
-# /tmp/loki-cpp /tmp/curlpp /tmp/crossguid /tmp/c-ares 
-#RUN chown -R www-data.www-data csvs
-
-### Clean
-## RUN rm csvs.tar.gz
-#
-#RUN rm /tmp/apache-arrow-apt-source-latest-bullseye.deb
 
 WORKDIR /app
 
-# Python 3 dependencies
-
-#COPY api api4opt core likes optimization playground plot settings static tags /app/
-#COPY docker-compose.yml docker-entrypoint.sh wait-for-it.sh /app/
-#COPY Pipfile Pipfile.lock requirements.txt /app/
 
 # Install pipenv
 RUN pip install --upgrade pip && \
@@ -254,30 +200,12 @@ RUN pip install --upgrade pip && \
 # and not into a virtualenv. Docker containers don't need virtual environments. 
 RUN pipenv install --system --deploy
 
-#RUN chown -R www-data.www-data csvs
-
-### Clean
-## RUN rm csvs.tar.gz
-#
-#RUN rm /tmp/apache-arrow-apt-source-latest-bullseye.deb
-
-
-#COPY variables.env /root/variables.env
-
-#COPY run_once.sh /root/
-#COPY entrypoint_standalone.sh /usr/local/bin/entrypoint.sh
-#RUN chmod +x /usr/local/bin/entrypoint.sh
 
 # Expose port 8000 on the container
 EXPOSE 8000
 #ENTRYPOINT [ "entrypoint.sh" ]
 
 
-# ... existing Dockerfile content ...
-#COPY init_eta.py /app/
-
-# Copy the entrypoint script
-#COPY docker-entrypoint.sh /app/docker-entrypoint.sh
 
 # Make the entrypoint script executable
 RUN chmod +x /app/docker-entrypoint.sh
@@ -287,6 +215,4 @@ RUN chmod +x /app/docker-entrypoint.sh
 
 # Set the entrypoint
 ENTRYPOINT ["/app/docker-entrypoint.sh"]
-
-
 
