@@ -26,6 +26,7 @@ services:
       - SECURE_SSL_REDIRECT=${SECURE_SSL_REDIRECT:-False}  # Override if needed
     volumes:
       - .:/app:delegated  # Consider limiting if not necessary for all services
+      - shared_nsga3_output:/opt/opt4cast/output/nsga3/  # Shared Volume
     networks:
       - app-network
     healthcheck:
@@ -49,6 +50,7 @@ services:
       - rabbitmq
     volumes:
       - .:/app:delegated
+      - shared_nsga3_output:/opt/opt4cast/output/nsga3/  # Shared Volume
     networks:
       - app-network
 
@@ -67,19 +69,18 @@ services:
       - rabbitmq
     volumes:
       - .:/app:delegated
+      - shared_nsga3_output:/opt/opt4cast/output/nsga3/  # Shared Volume
     networks:
       - app-network
 
   # Celery Worker Service
   celery:
     image: chesapeake-app:latest
-
     command: >
       sh -c "
         ./wait-for-it.sh web:8000 -- 
         celery -A cast worker --loglevel=info
       "
-      # command: ["celery", "-A", "cast", "worker", "--loglevel=info"]
     depends_on:
       - redis
       - rabbitmq
@@ -91,6 +92,7 @@ services:
       - SERVICE_TYPE=celery
     volumes:
       - .:/app:delegated
+      - shared_nsga3_output:/opt/opt4cast/output/nsga3/  # Shared Volume
     networks:
       - app-network
     healthcheck:
@@ -102,14 +104,11 @@ services:
   # Celery Beat Service
   celery-beat:
     image: chesapeake-app:latest
-
     command: >
       sh -c "
         ./wait-for-it.sh web:8000 -- 
         celery -A cast beat --loglevel=info
       "
-      # command: ["celery", "-A", "cast", "worker", "--loglevel=info"]
-      #command: ["celery", "-A", "cast", "beat", "--loglevel=info"]
     depends_on:
       - redis
       - rabbitmq
@@ -121,6 +120,7 @@ services:
       - SERVICE_TYPE=celery-beat
     volumes:
       - .:/app:delegated
+      - shared_nsga3_output:/opt/opt4cast/output/nsga3/  # Shared Volume
     networks:
       - app-network
     healthcheck:
@@ -137,9 +137,6 @@ services:
         ./wait-for-it.sh web:8000 -- 
         celery -A cast flower --loglevel=info
       "
-      # command: ["celery", "-A", "cast", "worker", "--loglevel=info"]
-      # command: ["celery", "-A", "cast", "beat", "--loglevel=info"]
-      # command: ["celery", "-A", "cast", "flower"]
     depends_on:
       - rabbitmq
       - web
@@ -157,6 +154,7 @@ services:
       - "5555:5555"
     volumes:
       - .:/app:delegated
+      - shared_nsga3_output:/opt/opt4cast/output/nsga3/  # Shared Volume
     networks:
       - app-network
     healthcheck:
@@ -186,7 +184,6 @@ services:
     image: rabbitmq:3-management
     ports:
       - "15672:15672"  # Management UI port
-      # - "5672:5672"  # Uncomment if external AMQP access is needed
     restart: always
     env_file:
       - variables.env
@@ -220,6 +217,8 @@ volumes:
   mypostgresdata:
   myredisdata:
   myrabbitmqdata:
+  shared_nsga3_output:  # Define the shared named volume
+    driver: local  # Optional: Specify the driver if needed
 
 networks:
   app-network:
