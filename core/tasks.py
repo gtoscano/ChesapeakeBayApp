@@ -521,7 +521,9 @@ def get_animal_bmps_by_sector_lrs(animal_bmps):
             #animal_name = animal_dict[animal_id]
             animal_name = AnimalGrp.objects.get(id=animal_id).name
             bmp_id = result_list[4]
-            bmp = bmp_dict[bmp_id]
+            #bmp = bmp_dict[bmp_id]
+
+            bmp = Bmp.objects.get(id=bmp_id).name
             price = float(BmpCost.objects.filter(Q(state__id=state_id), Q(bmp__id=bmp_id)).first().cost)
             cost = price * value
             animal.append({'id': counter, 'base_condition': base_condition, 'state_id': state_id, 'state': state_abbr ,'county_id': county_id, 'county': county, 'load_src_id': load_src_id, 'load_src': load_src, 'sector': sector, 'animal_id': animal_id, 'animal': animal_name, 'bmp_id': bmp_id, 'bmp': bmp, 'amount': value, 'price': price, 'cost': cost})
