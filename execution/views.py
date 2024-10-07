@@ -122,6 +122,7 @@ class ListExecutions(LoginRequiredMixin, SingleTableMixin, ListView):
         ctx['create_url'] = reverse('create_execution')
         ctx['scenario_id'] = scenario_id
         return ctx
+    
     def get_queryset(self):
         """
         Overrides the default queryset to return executions filtered by the scenario_id
@@ -156,6 +157,7 @@ class ListExecutions(LoginRequiredMixin, SingleTableMixin, ListView):
             #context = self.get_context_data(table=table, selected_edge=selected_edge, execution_id=execution_id, page_title='My Solutions')
             #html = render_to_string('solution/partials/_table.html', context, request=request)
             #return HttpResponse(html)
+
 def count_rows_in_file(file_path):
     try:
         with open(file_path, 'r') as file:
@@ -177,6 +179,7 @@ def get_first_values_from_file(file_path):
     except FileNotFoundError:
         print("File not found.")
         return "File not found."
+    
 def load_json_data(file_path):
     with open(file_path, 'r') as file:
         data = json.load(file)

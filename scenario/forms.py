@@ -8,7 +8,6 @@ class ScenarioInfoForm(forms.ModelForm):
         model = ScenarioInfo
         fields = ['name', 'description', 'data_revision', 'condition', 'type_id', 'backout', 'point_src', 'atm_dep', 'climate_change', 'soil', 'base_load']
 
-
 class MultipleHiddenInput(forms.HiddenInput):
     def __init__(self, attrs=None):
         super().__init__(attrs)

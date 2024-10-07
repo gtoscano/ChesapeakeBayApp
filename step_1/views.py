@@ -32,6 +32,7 @@ class ScenarioInfoView(LoginRequiredMixin, TemplateView):
 
                
         return context
+    
 class ScenarioInfoExecView(LoginRequiredMixin, TemplateView):
     template_name = 'step_1/info_exec.html'
 

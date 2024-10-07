@@ -85,7 +85,6 @@ class CreateScenario(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         geographic_areas_m2m = form.cleaned_data.get('geographic_areas')
 
-    
         # Filter BaseScenarios with the same scenario_info
         base_scenarios_with_same_info = BaseScenario.objects.filter(
             scenario_info=form.instance.scenario_info
@@ -122,8 +121,6 @@ class CreateScenario(LoginRequiredMixin, CreateView):
         loads['total_acres_pct'] = 100.0
 
         form.instance.loads = loads
-
-
     
         # Set the user_id before saving the Scenario instance
         form.instance.user = self.request.user
