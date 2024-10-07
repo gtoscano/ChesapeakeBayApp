@@ -38,10 +38,8 @@ class ScenarioForm(forms.ModelForm):
             'geographic_areas': MultipleHiddenInput(),
         }
 
-
 class EmailForm(forms.Form):
     email = forms.EmailField(label='Email', required=True)
-
 
 class ScenarioShareForm(forms.ModelForm):
     class Meta:

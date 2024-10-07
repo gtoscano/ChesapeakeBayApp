@@ -65,7 +65,9 @@ class ScenarioTable(tables.Table):
     class Meta:
         model = Scenario 
         template_name = 'django_tables2/bootstrap5.html'
-        fields = ('id', 'name', 'base_scenario.scenario_info', 'counties', 'updated_at', 'status', 'actions')
+        # fields = ('id', 'name', 'base_scenario.scenario_info', 'counties', 'updated_at', 'status', 'actions')
+        # Removing status till it is fixed
+        fields = ('id', 'name', 'base_scenario.scenario_info', 'counties', 'updated_at', 'actions')
         order_by = ('-updated_at', 'name' )
         #empty_text = 'No data available in table'
         attrs = {
