@@ -47,6 +47,7 @@ class ScenarioTable(tables.Table):
 
         # return format_html('<div class="action-icons-container">{} {} {} {}</div>'.format(edit_link, execute_link, decision_making_link, share_link))
         return format_html('<div class="action-icons-container">{} {} {} {}</div>'.format(edit_link, execute_link, "", ""))
+    
     def render_counties(self, record):
         # Assuming 'geographic_areas_by_state' is a JSON field in the 'base_scenario' model
         areas = record.base_scenario.geographic_areas.all()
@@ -63,6 +64,7 @@ class ScenarioTable(tables.Table):
             # Join the formatted strings with a semicolon and space for separation
             return format_html("; ".join(formatted_areas))
         return "N/A"
+    
     class Meta:
         model = Scenario 
         template_name = 'django_tables2/bootstrap5.html'
