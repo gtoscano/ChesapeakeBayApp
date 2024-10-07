@@ -29,23 +29,24 @@ class ScenarioTable(tables.Table):
     def render_actions(self, value, record):
         edit_icon = '<i class="material-icons" title="Edit Scenario">add_task</i>'
         execute_icon = '<i class="material-icons" title="Results">fact_check</i>'
-        decision_making_icon = '<i class="material-icons" title="Decision Making">analytics</i>'
-        share_icon = '<i class="material-icons" title="Share Scenario">share</i>'
+        # decision_making_icon = '<i class="material-icons" title="Decision Making">analytics</i>'
+        # share_icon = '<i class="material-icons" title="Share Scenario">share</i>'
 
         if record.base_scenario.status == 'C':
             # Links are clickable and green
             edit_link = '<a href="/step_2/{}/" style="color: green;">{}</a>'.format(record.id, edit_icon)
             execute_link = '<a href="/execution/list/{}/" style="color: green;">{}</a>'.format(record.id, execute_icon)
-            decision_making_link = '<a href="/decision_making/{}" style="margin-left: 10px; color: green;">{}</a>'.format(record.id, decision_making_icon)
-            share_link= '<a href="/scenario/share/{}/" style="margin-left: 10px; color: green;">{}</a>'.format(record.id, share_icon)
+            # decision_making_link = '<a href="/decision_making/{}" style="margin-left: 10px; color: green;">{}</a>'.format(record.id, decision_making_icon)
+            # share_link= '<a href="/scenario/share/{}/" style="margin-left: 10px; color: green;">{}</a>'.format(record.id, share_icon)
         else:
             # Links are not clickable and red
             edit_link = '<span style="color: red;">{}</span>'.format(edit_icon)
             execute_link = '<span style="color: red;">{}</span>'.format(execute_icon)
-            decision_making_link = '<span style="margin-left: 10px; color: red;">{}</span>'.format(decision_making_icon)
-            share_link = '<span style="margin-left: 10px; color: red;">{}</span>'.format(share_icon)
+            # decision_making_link = '<span style="margin-left: 10px; color: red;">{}</span>'.format(decision_making_icon)
+            # share_link = '<span style="margin-left: 10px; color: red;">{}</span>'.format(share_icon)
 
-        return format_html('<div class="action-icons-container">{} {} {} {}</div>'.format(edit_link, execute_link, decision_making_link, share_link))
+        # return format_html('<div class="action-icons-container">{} {} {} {}</div>'.format(edit_link, execute_link, decision_making_link, share_link))
+        return format_html('<div class="action-icons-container">{} {} {} {}</div>'.format(edit_link, execute_link, "", ""))
     def render_counties(self, record):
         # Assuming 'geographic_areas_by_state' is a JSON field in the 'base_scenario' model
         areas = record.base_scenario.geographic_areas.all()

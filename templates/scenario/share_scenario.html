@@ -4,7 +4,7 @@
 {% block content %}
 
 <div class="container">
-    <div class="px-5 my-5 text-center">
+    <!-- <div class="px-5 my-5 text-center">
         <h1 class="text-4xl font-bold text-primary">
             Share Scenario
         </h1>
@@ -14,7 +14,7 @@
         {% csrf_token %}
         {% crispy form %}
         <button type="submit" class="btn btn-primary">Share</button>
-    </form>
+    </form> -->
 
     <div class="px-5 my-5 text-right">
         <a href="{{ request.META.HTTP_REFERER|escape }}" class="btn btn-secondary btn-sm">
