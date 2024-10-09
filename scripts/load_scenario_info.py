@@ -1,4 +1,4 @@
-# python manage.py runscript load_datV
+# python manage.py runscript load_scenario_info
 import random
 import openpyxl
 from django.contrib.auth import get_user_model
@@ -12,6 +12,7 @@ def run():
 
     xlsx = openpyxl.load_workbook(filename)
     sheet_names = xlsx.get_sheet_names()
+    print (sheet_names)
 
     if 'ScenarioInfo' in sheet_names:
         scenario_infos = ScenarioInfo.objects.all()
