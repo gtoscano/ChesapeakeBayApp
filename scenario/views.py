@@ -87,7 +87,7 @@ class CreateScenario(LoginRequiredMixin, CreateView):
         base_scenarios_with_same_info = BaseScenario.objects.filter(
             scenario_info=form.instance.scenario_info
         )
-    
+
         base_scenario = None
         for bs in base_scenarios_with_same_info:
             if set(bs.geographic_areas.all()) == set(geographic_areas_m2m):
