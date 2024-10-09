@@ -105,10 +105,9 @@ def get_selected_states(areas):
             if state not in states_list:
                 states_list.append(state);
         return states_list;
-def run_base_scenario(base_scenario_id):
 
+def run_base_scenario(base_scenario_id):
     BaseScenario.objects.filter(pk=base_scenario_id).update(status='E')
-    
     base_scenario = BaseScenario.objects.get(id=base_scenario_id)
     uuid = base_scenario.uuid
     sinfo = ScenarioInfo.objects.get(pk=base_scenario.scenario_info.id)
@@ -438,9 +437,14 @@ def get_first_values_from_file(file_path):
         return "File not found."
 
 def load_json_data(file_path):
-    with open(file_path, 'r') as file:
-        data = json.load(file)
-    return data
+    try:
+        with open(file_path, 'r') as file:
+            # Read each line, split by comma, and get the first value
+            data = json.load(file)
+            return data
+        return first_values
+    except FileNotFoundError:
+        return "File not found."
 
 def compute_costs(submitted_land):
     total_cost = 0.0

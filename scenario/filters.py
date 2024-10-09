@@ -13,8 +13,6 @@ class ScenarioInfoFilter(django_filters.FilterSet):
         model = ScenarioInfo
         fields = ('name', )
 
-
-
 class ScenarioFilter(django_filters.FilterSet):
     name = django_filters.CharFilter(lookup_expr='icontains')
     updated_at = DateFromToRangeFilter(
@@ -22,6 +20,7 @@ class ScenarioFilter(django_filters.FilterSet):
         label='Updated at (Between)',
         widget=DateRangeWidget(attrs={'type': 'date'})
     )
+
     created_at_start = django_filters.DateFilter(
         field_name='created_at',
         lookup_expr='gte',
@@ -42,9 +41,10 @@ class ScenarioFilter(django_filters.FilterSet):
         to_field_name='id',
         required=False  # Set required to False to make it optional
     )
+
     class Meta:
         model = Scenario
-        fields = ('name', 'scenario_info', 'geographic_areas', 'created_at_start', 'created_at_end','updated_at')
+        fields = ('name', 'scenario_info', 'geographic_areas', 'created_at_start', 'created_at_end', 'updated_at')
 
         #layout = (
         #('name', 'scenario_info'),

@@ -2,6 +2,7 @@
 from django import forms
 from django_select2 import forms as s2forms
 from core.models import ScenarioInfo, Scenario
+from core.models import ScenarioInfo, Scenario, BaseScenario, GeographicArea, State
 
 class ScenarioInfoForm(forms.ModelForm):
     class Meta:
@@ -30,7 +31,6 @@ class ScenarioForm(forms.ModelForm):
     class Meta:
         model = Scenario
         fields = ['name', 'scenario_info', 'geographic_areas']
-
         widgets = {
             'scenario_info': forms.Select(attrs={'class': 'select2'}),
             #'geographic_areas': forms.SelectMultiple(attrs={'class': 'select2'}),

@@ -7,7 +7,6 @@ from django.utils import timezone
 class User(AbstractUser):
     pass
 
-
 class State(models.Model):
     name = models.CharField(max_length=100)
     abbreviation = models.CharField(max_length=2)
@@ -57,6 +56,7 @@ class LandRiverSegment(models.Model):
 
     def __str__(self):
         return '{}'.format(self.name)
+    
 class Sector(models.Model):
     name = models.CharField(max_length=100)
     def __str__(self):
@@ -109,6 +109,7 @@ class Bmp(models.Model):
 
     def __str__(self):
         return self.name
+    
 class BaseScenario(models.Model):
     STATUS_PENDING = 'P'
     STATUS_EVALUATING = 'E'

@@ -50,7 +50,6 @@ class ListScenarios(LoginRequiredMixin, SingleTableMixin, ListView):
     template_name = 'scenario/list_table_generic.html'
     paginate_by = 25 
 
-
     def get_queryset(self):
         """Override to filter scenarios by the logged-in user."""
         # This retrieves only the scenarios that belong to the current user.
@@ -58,12 +57,10 @@ class ListScenarios(LoginRequiredMixin, SingleTableMixin, ListView):
 
     def get_context_data(self, **kwargs):
         ctx = super(ListScenarios, self).get_context_data(**kwargs)
-
         ctx['page_title'] = 'My Scenarios'
         ctx['create_title'] = 'New Scenario'
         ctx['create_url'] = reverse('create_scenario')
         return ctx
-
 
 
 class CreateScenario(LoginRequiredMixin, CreateView):
@@ -83,6 +80,7 @@ class CreateScenario(LoginRequiredMixin, CreateView):
         return super().form_invalid(form)
 
     def form_valid(self, form):
+        print("*** Valid 1 ***")
         geographic_areas_m2m = form.cleaned_data.get('geographic_areas')
 
         # Filter BaseScenarios with the same scenario_info
@@ -96,17 +94,18 @@ class CreateScenario(LoginRequiredMixin, CreateView):
                 base_scenario = bs
                 break
     
-        if base_scenario:
-            print('Using existing BaseScenario', base_scenario)
-        else:
+        # if base_scenario:
+        #     print('Using existing BaseScenario', base_scenario)
+        # else:
             # Create new BaseScenario instance if not exists
-            base_scenario = BaseScenario.objects.create(scenario_info=form.instance.scenario_info)
-            base_scenario.geographic_areas.set(geographic_areas_m2m)
-            base_scenario.save()
-            print('To Create new BaseScenario', base_scenario)
-            process_new_base_scenario.delay(base_scenario.id)
-            print('Created new BaseScenario', base_scenario)
-    
+        base_scenario = BaseScenario.objects.create(scenario_info=form.instance.scenario_info)
+        base_scenario.geographic_areas.set(geographic_areas_m2m)
+        base_scenario.save()
+        print('To Create new BaseScenario', base_scenario)
+        process_new_base_scenario.delay(base_scenario.id)
+        print('Created new BaseScenario', base_scenario)
+        
+        print("*** Valid 2 ***")
         # Assign the BaseScenario (new or existing) to the Scenario instance
         form.instance.base_scenario = base_scenario
         form.instance.status = 'P'
@@ -121,7 +120,8 @@ class CreateScenario(LoginRequiredMixin, CreateView):
         loads['total_acres_pct'] = 100.0
 
         form.instance.loads = loads
-    
+
+        print("*** Valid 3 ***")
         # Set the user_id before saving the Scenario instance
         form.instance.user = self.request.user
     
