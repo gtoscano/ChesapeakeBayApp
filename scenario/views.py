@@ -94,16 +94,16 @@ class CreateScenario(LoginRequiredMixin, CreateView):
                 base_scenario = bs
                 break
     
-        # if base_scenario:
-        #     print('Using existing BaseScenario', base_scenario)
-        # else:
+        if base_scenario:
+            print('Using existing BaseScenario', base_scenario)
+        else:
             # Create new BaseScenario instance if not exists
-        base_scenario = BaseScenario.objects.create(scenario_info=form.instance.scenario_info)
-        base_scenario.geographic_areas.set(geographic_areas_m2m)
-        base_scenario.save()
-        print('To Create new BaseScenario', base_scenario)
-        process_new_base_scenario.delay(base_scenario.id)
-        print('Created new BaseScenario', base_scenario)
+            base_scenario = BaseScenario.objects.create(scenario_info=form.instance.scenario_info)
+            base_scenario.geographic_areas.set(geographic_areas_m2m)
+            base_scenario.save()
+            print('To Create new BaseScenario', base_scenario)
+            process_new_base_scenario.delay(base_scenario.id)
+            print('Created new BaseScenario', base_scenario)
         
         print("*** Valid 2 ***")
         # Assign the BaseScenario (new or existing) to the Scenario instance
