@@ -47,6 +47,10 @@ REDIS_DB_CELERY =  os.environ.get('REDIS_DB_CELERY','1')
 REDIS_DB_RESULT=  os.environ.get('REDIS_DB_RESULT','1')
 REDIS_DB_CACHE =  os.environ.get('REDIS_DB_CACHE', '3')
 
+CKEDITOR_BASEPATH = "/static/ckeditor/ckeditor/"
+CKEDITOR_UPLOAD_PATH = "uploads/"
+CKEDITOR_IMAGE_BACKEND= 'ckeditor_uploader.backends.PillowBackend'
+
 BOKEH_URL = 'https://bokeh.toscano.mx/multiplotall'
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
@@ -103,7 +107,102 @@ SITE_ID = 1
 SECURE_SSL_REDIRECT = os.environ.get('SECURE_SSL_REDIRECT', 'False') == 'True'
 ##CSRF_COOKIE_SECURE = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 # Application definition
+
+customColorPalette = [
+        {
+            'color': 'hsl(4, 90%, 58%)',
+            'label': 'Red'
+        },
+        {
+            'color': 'hsl(340, 82%, 52%)',
+            'label': 'Pink'
+        },
+        {
+            'color': 'hsl(291, 64%, 42%)',
+            'label': 'Purple'
+        },
+        {
+            'color': 'hsl(262, 52%, 47%)',
+            'label': 'Deep Purple'
+        },
+        {
+            'color': 'hsl(231, 48%, 48%)',
+            'label': 'Indigo'
+        },
+        {
+            'color': 'hsl(207, 90%, 54%)',
+            'label': 'Blue'
+        },
+    ]
+
+CKEDITOR_5_CONFIGS = {
+    'default': {
+        'toolbar': { 'items':[
+            'undo', 'redo',
+            '|', 'heading',
+            {
+                'label': 'Fonts',
+                'withText': True,
+                'items': [ 'fontSize', 'fontFamily', 'fontColor', 'fontBackgroundColor' ]
+            },
+            {'name': 'paragraph', 'label': 'Paragraph', 'withText': True,
+                'items': ['NumberedList', 'BulletedList', 'TodoList', '-', 'Outdent', 'Indent', '-', 'Blockquote', '-', 'alignment',]},
+            {'name': 'image', 'label': 'Image', 'withText': True,
+                'items': ['imageTextAlternative', 'imageStyle:alignLeft', 'imageStyle:side', 'imageStyle:alignRight', 'imageStyle:alignCenter', 'imageStyle:side', 'linkImage']},
+                '|', 'bold', 'italic', 'link', 'strikethrough', 'subscript', 'superscript', 
+                '|', 'blockQuote', 'code', 'codeBlock', 'sourceEditing',
+                '|', 'mediaEmbed','uploadImage', 
+                '|', 'insertTable', 'tableColumn', 'tableRow', 'mergeTableCells'
+             ], 
+                'shouldNotGroupWhenFull': True,
+        },
+        'image': {
+            'toolbar': [ 'imageTextAlternative', 'imageStyle:alignLeft', 'imageStyle:side', 'imageStyle:alignRight', 'imageStyle:alignCenter', 'imageStyle:side', 'linkImage'],
+            'styles': [
+                'alignLeft', 'alignRight', 'alignCenter', 'side'
+            ]
+        },
+        'table': {
+            'contentToolbar': [ 'tableColumn', 'tableRow', 'mergeTableCells',
+            'tableProperties', 'tableCellProperties' ],
+            'tableProperties': {
+                'borderColors': customColorPalette,
+                'backgroundColors': customColorPalette
+            },
+            'tableCellProperties': {
+                'borderColors': customColorPalette,
+                'backgroundColors': customColorPalette
+            }
+        },
+
+    },
+    'plugins': {
+        'table': {
+            'contentToolbar': [ 'tableColumn', 'tableRow', 'mergeTableCells',
+            'tableProperties', 'tableCellProperties' ],
+            'tableProperties': {
+                'borderColors': customColorPalette,
+                'backgroundColors': customColorPalette
+            },
+            'tableCellProperties': {
+                'borderColors': customColorPalette,
+                'backgroundColors': customColorPalette
+            }
+        },
+    },
+
+    'list': {
+        'properties': {
+            'styles': 'true',
+            'startIndex': 'true',
+            'reversed': 'true',
+        }
+    },
+    
+}
+
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -139,6 +238,7 @@ INSTALLED_APPS = [
     "bootstrap_datepicker_plus",
     'django_celery_beat',
     'django_celery_results',
+    'django_ckeditor_5',
     'core',
     'rag',
     'scenario',
@@ -153,7 +253,9 @@ INSTALLED_APPS = [
     'optimization',
     'decision_making',
     'templatetags',
-    'sslserver'
+    'sslserver',
+    #'emails',
+
 ]
 CRISPY_ALLOWED_TEMPLATE_PACKS = [
     "daisyui",

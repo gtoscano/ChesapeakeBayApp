@@ -15,4 +15,5 @@ class OptimizationView(LoginRequiredMixin, RedirectView):
         messages.info(self.request, 'Optimizing scenario... Please wait.')
         scenario_id = self.kwargs.get('id')  # Assuming you're passing the ID in the URL
         process_new_optimization.delay(scenario_id)
+        
         return reverse_lazy('list_scenarios')  # Redirect to list-scenarios URL

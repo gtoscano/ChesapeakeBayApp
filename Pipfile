@@ -66,6 +66,7 @@ exceptiongroup = "*"
 flower = "*"
 django-celery-beat = "*"
 django-celery-results = "*"
+django-ckeditor-5 = "*"
 
 [dev-packages]
 

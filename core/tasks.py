@@ -12,38 +12,22 @@ import json
 from django.db.models import Q
 from uuid import uuid4
 import pandas as pd
-
 from os.path import basename
 
+#from emails.models import Email, EmailTemplate
 from zipfile import ZipFile
 import zipfile
+
+OPT4CAST_RUN_BASE_SIMPLE_PATH = os.environ.get('OPT4CAST_RUN_BASE_SIMPLE_PATH', '/home/gtoscano/projects/run_base/build/run_base_simple')
+OPT4CAST_MAKE_SCENARIO_FILE_PATH = os.environ.get('OPT4CAST_MAKE_SCENARIO_FILE_PATH', '/home/gtoscano/projects/CastEvaluation/build/test/scenario_test')
+OPT4CAST_RUN_EPS_CNSTR_PATH = os.environ.get('OPT4CAST_RUN_EPS_CNSTR_PATH', '/home/gtoscano/projects/MSUCast/build/eps_cnstr/eps_cnstr')
+OPT4CAST_RUN_PSO_PATH = os.environ.get('OPT4CAST_RUN_PSO_PATH', '/home/gtoscano/projects/MSUCast/build/pso')
+OPT4CAST_RUN_NSGA_PATH = os.environ.get('OPT4CAST_RUN_NSGA_PATH', '/home/gtoscano/projects/nsga3-cbw/build/nsga3-cbw')
+
 
 @shared_task
 def add(x, y):
     return x + y
-
-# Global variables initialized to None
-#agency_dict = None
-#bmp_dict = None
-#load_src_dict = None
-#animal_dict = None
-#county_dict = None
-#sector_dict = None
-#load_src_sector_dict = None
-#lrs_dict = None
-#def initialize_globals():
-#    global agency_dict, bmp_dict, load_src_dict, animal_dict, county_dict, sector_dict, load_src_sector_dict, lrs_dict
-#    if agency_dict is None:
-#        #agency_dict = {str(agency.id): agency.name for agency in Agency.objects.all()}
-#        #bmp_dict = {str(bmp.id): bmp.name for bmp in Bmp.objects.all()}
-#        #load_src_dict = {str(load_src.id): load_src.name for load_src in LoadSrc.objects.all()}
-#        #animal_dict = {str(animal.id): animal.name for animal in AnimalGrp.objects.all()}
-#        #county_dict = {str(county.county): f'{county.name}, {county.state}' for county in GeographicArea.objects.all()}
-#        #sector_dict = {str(sector.id): f'{sector.name}' for sector in Sector.objects.all()}
-#        #load_src_sector_dict = {str(load_src.id): load_src.sector.name for load_src in LoadSrc.objects.all()}
-#        #lrs_dict = {str(lrs.id): lrs.name for lrs in LandRiverSegment.objects.all()}
-
-#OPT4CAST_RUN_BASE_SIMPLE_PATH = os.environ.get('OPT4CAST_RUN_BASE_SIMPLE_PATH', '/app/optimization/run_base/build/run_base')
 
 def get_selected_bmps(selected_bmps):
     selected_bmps_set = set()  # Use a set to store unique values
@@ -55,14 +39,8 @@ def get_selected_bmps(selected_bmps):
                 selected_bmps_list.append(value)  # Append the value to the list
     return selected_bmps_list
 
-OPT4CAST_RUN_BASE_SIMPLE_PATH = os.environ.get('OPT4CAST_RUN_BASE_SIMPLE_PATH', '/home/gtoscano/projects/run_base/build/run_base_simple')
-
 def get_all_file_paths(directory):
-
-    # initializing empty file paths list
     file_paths = []
-
-    # crawling through directory and subdirectories
     for root, directories, files in os.walk(directory):
         for filename in files:
             # join the two strings in order to form the full filepath.
@@ -71,6 +49,7 @@ def get_all_file_paths(directory):
 
     # returning all file paths
     return file_paths
+
 def zip_directory(directory_path, zip_path, prefix='/results/' ):
     with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
         for root, _, files in os.walk(directory_path):
@@ -135,19 +114,11 @@ def run_base_scenario(base_scenario_id):
             sinfo.soil, 
             sinfo.data_revision, 
             geography)
-    print (emo_data)
-    print('in Celery ', base_scenario)
-    # Add your processing logic here
-
-
-    #std::string emo_data = fmt::format("{}_{}_{}_{}_{}_{}_{}_{}_{}_{}_{}_{}_{}_{}",scenario_name, atm_dep_data_set, back_out_scenario, base_condition, base_load, cost_profile, climate_change_data_set, ncounties, historical_crop_need_scenario, point_source_data_set, scenario_type, soil_p_data_set, source_data_revision, geography);
 
     args = [OPT4CAST_RUN_BASE_SIMPLE_PATH, emo_data, str(uuid), str(ncounties) ]
     print(args)
 
-    #/home/gtoscano/django/api4opt4/optimization/run_base/build/run_base_simple base_0_6611_256_6_4_59_1_6608_158_2_31_8_294 531761ac-a0a9-4dd7-954a-dc536a1d1cad 1
     process = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-
     stdout, stderr = process.communicate()
 
     stdout_str = stdout.decode('utf-8')
@@ -169,7 +140,6 @@ def run_base_scenario(base_scenario_id):
     #print('SINFO.ID', sinfo.id)
 
 
-OPT4CAST_MAKE_SCENARIO_FILE_PATH = os.environ.get('OPT4CAST_MAKE_SCENARIO_FILE_PATH', '/home/gtoscano/projects/CastEvaluation/build/test/scenario_test')
 
 def make_base_scenario_init_file(base_scenario_id):
     
@@ -253,10 +223,6 @@ def process_new_base_scenario(base_scenario_id):
     #initialize_globals()
     run_base_scenario(base_scenario_id)
     make_base_scenario_init_file(base_scenario_id)
-
-OPT4CAST_RUN_EPS_CNSTR_PATH = os.environ.get('OPT4CAST_RUN_EPS_CNSTR_PATH', '/home/gtoscano/projects/MSUCast/build/eps_cnstr/eps_cnstr')
-OPT4CAST_RUN_PSO_PATH = os.environ.get('OPT4CAST_RUN_PSO_PATH', '/home/gtoscano/projects/MSUCast/build/pso')
-OPT4CAST_RUN_NSGA_PATH = os.environ.get('OPT4CAST_RUN_NSGA_PATH', '/home/gtoscano/projects/nsga3-cbw/build/nsga3-cbw')
 
 
 @shared_task
