@@ -157,7 +157,7 @@ RUN ./configure && \
 
 WORKDIR /app_src/github/
 RUN git clone https://github.com/gtoscano/CastEvaluation.git && \
-    git clone https://github.com/gtoscano/alfred.git && \
+    git clone https://github.com/gtoscano/alfred_aio.git && \
     git clone https://github.com/gtoscano/MSUCast.git && \
     git clone https://github.com/gtoscano/run_base
 
@@ -169,7 +169,7 @@ RUN cmake /app_src/github/CastEvaluation && \
     make install 
 
 WORKDIR /app_src/alfred
-RUN cmake /app_src/github/alfred&& \
+RUN cmake /app_src/github/alfred_aio && \
     make clean && \
     make && \
     make install
