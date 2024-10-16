@@ -254,7 +254,7 @@ INSTALLED_APPS = [
     'decision_making',
     'templatetags',
     'sslserver',
-    #'emails',
+    'emails',
 
 ]
 CRISPY_ALLOWED_TEMPLATE_PACKS = [

@@ -67,6 +67,7 @@ flower = "*"
 django-celery-beat = "*"
 django-celery-results = "*"
 django-ckeditor-5 = "*"
+weasyprint = "*"
 
 [dev-packages]
 

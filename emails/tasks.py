@@ -1,6 +1,6 @@
 from .models import Email, EmailGroup
-from sections.models import Section
-from members.models import Member
+#from sections.models import Section
+#from members.models import Member
 from time import sleep
 from celery import shared_task
 import subprocess
@@ -22,7 +22,6 @@ import time
 import subprocess
 from datetime import datetime
 
-from weasyprint import HTML
 from datetime import datetime
 
 def zipit(directory, zip_filename, prefix='/results/'):
@@ -85,51 +84,51 @@ def is_member_of_group(user, group_name):
 @shared_task
 def create_email_groups():
     section_group = {}
-    sections = Section.objects.filter()
-    for section in sections:
-        slug = str(section.slug)
-        section_group[slug] = []
-    members = Member.objects.all()
-    for member in members:
-        user = get_user_model().objects.filter(id=member.user.id).first()
-        section_group['miembros'] = section_group.get('miembros', []) + [user.id]
-        # by section
-        for mem_sec in member.sections.all():
-            slug = str(mem_sec.slug)
-            section_group[slug] = section_group.get(slug, []) + [user.id]
+    #sections = Section.objects.filter()
+    #for section in sections:
+    #    slug = str(section.slug)
+    #    section_group[slug] = []
+    #members = Member.objects.all()
+    #for member in members:
+    #    user = get_user_model().objects.filter(id=member.user.id).first()
+    #    section_group['miembros'] = section_group.get('miembros', []) + [user.id]
+    #    # by section
+    #    for mem_sec in member.sections.all():
+    #        slug = str(mem_sec.slug)
+    #        section_group[slug] = section_group.get(slug, []) + [user.id]
 
-        groups = ['comision_membresia', 'comision_premio', 'consejo_directivo']
-        for group in groups:
-            if user.groups.filter(name=group).exists():
-                section_group[group] = section_group.get(group, []) + [user.id]
+    #    groups = ['comision_membresia', 'comision_premio', 'consejo_directivo']
+    #    for group in groups:
+    #        if user.groups.filter(name=group).exists():
+    #            section_group[group] = section_group.get(group, []) + [user.id]
 
-        membership_types = ['regulares', 'adherentes', 'correspondientes']
-        if member.membership == 'R':
-            section_group['regulares'] = section_group.get('regulares', []) + [user.id]
-        elif member.membership == 'adherentes':
-            section_group['A'] = section_group.get('adherentes', []) + [user.id]
-        elif member.membership == 'C':
-            section_group['correspondientes'] = section_group.get('correspondientes', []) + [user.id]
+    #    membership_types = ['regulares', 'adherentes', 'correspondientes']
+    #    if member.membership == 'R':
+    #        section_group['regulares'] = section_group.get('regulares', []) + [user.id]
+    #    elif member.membership == 'adherentes':
+    #        section_group['A'] = section_group.get('adherentes', []) + [user.id]
+    #    elif member.membership == 'C':
+    #        section_group['correspondientes'] = section_group.get('correspondientes', []) + [user.id]
 
-    for key, value in section_group.items():
-        if EmailGroup.objects.filter(title=key).exists() and value!= []:
-            email_group = EmailGroup.objects.filter(title=key).first()
-            curr_users_list = []
-            curr_users = email_group.users.all()
-            for item in curr_users:
-                curr_users_list.append(item.id)
+    #for key, value in section_group.items():
+    #    if EmailGroup.objects.filter(title=key).exists() and value!= []:
+    #        email_group = EmailGroup.objects.filter(title=key).first()
+    #        curr_users_list = []
+    #        curr_users = email_group.users.all()
+    #        for item in curr_users:
+    #            curr_users_list.append(item.id)
 
 
-            if sorted(curr_users_list) != sorted(value):
-                email_group.users.set(value)
-                email_group.save()
-        elif value != [] :
-            new_email_group = EmailGroup(title=key)
-            new_email_group.save()
-            #for element in value:
-            #    new_email_group.users.add(element)
-            new_email_group.users.set(value)
-            new_email_group.save()
+    #        if sorted(curr_users_list) != sorted(value):
+    #            email_group.users.set(value)
+    #            email_group.save()
+    #    elif value != [] :
+    #        new_email_group = EmailGroup(title=key)
+    #        new_email_group.save()
+    #        #for element in value:
+    #        #    new_email_group.users.add(element)
+    #        new_email_group.users.set(value)
+    #        new_email_group.save()
 
 
 @shared_task
@@ -154,22 +153,3 @@ def create_certificate(name):
     print(f"Certificate created: {output_pdf_path}")
 
 
-def create_certificate_with_weasyprint(name):
-    # Load the template
-    template_path = "template.html"
-    with open(template_path, 'r') as file:
-        template = file.read()
-
-    # Replace placeholders with actual values
-    date_today = datetime.now().strftime("%B %d, %Y")
-    personalized_html = template.replace("{name}", name).replace("{{date}}", date_today)
-
-    # Convert the personalized HTML to PDF
-    output_pdf_path = f"{name}_certificate.pdf"
-    HTML(string=personalized_html).write_pdf(output_pdf_path)
-    print(f"Certificate created with WeasyPrint: {output_pdf_path}")
-
-# Example usage
-#create_certificate_with_weasyprint("Jane Doe")
-# Example usage
-#create_certificate("John Doe")

@@ -5,6 +5,23 @@ from django.contrib.auth import get_user_model
 from core.models import *
 from django.contrib.auth.models import Group
 from decimal import Decimal
+import csv
+
+#def save_to_csv(csv_filename, sheet):
+#    #csv_filename = 'scripts/ScenarioInfo.csv'
+#
+#    with open(csv_filename, 'w', newline='', encoding='utf-8') as csvfile:
+#        csv_writer = csv.writer(csvfile)
+#
+#        # Extract the first row for headers
+#        headers = [cell.value for cell in next(sheet.iter_rows(values_only=True))]
+#        csv_writer.writerow(headers)
+#
+#        # Write the remaining rows
+#        for row in sheet.iter_rows(min_row=2, values_only=True):
+#            csv_writer.writerow(row)
+#
+#    print(f"Data with headers successfully written to {csv_filename}")
 
 def run():
     from email.utils import parseaddr
@@ -14,12 +31,15 @@ def run():
     sheet_names = xlsx.get_sheet_names()
 
     if 'ScenarioInfo' in sheet_names:
+
         scenario_infos = ScenarioInfo.objects.all()
         current_scenario_infos = []
         for scenario_info in scenario_infos:
             current_scenario_infos.append(scenario_info.name)
 
         tab = xlsx["ScenarioInfo"]
+        csv_filename = 'scripts/TblScenario.csv'
+        #save_to_csv(csv_filename, tab)
         row_count = tab.max_row
         for row_idx in range(2, row_count + 1):
             cast_id = tab.cell(row = row_idx, column=1).value
