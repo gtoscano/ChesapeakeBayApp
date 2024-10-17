@@ -16,8 +16,6 @@ class ScenarioInfoTable(tables.Table):
         }
         search_placeholder = 'Search ...'
 
-
-
 class ScenarioTable(tables.Table):
     name = tables.Column(orderable=True)
     counties = tables.Column(orderable=False, empty_values=(), verbose_name='Counties')

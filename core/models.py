@@ -66,6 +66,7 @@ class BmpCategory(models.Model):
     name = models.CharField(max_length=100)
     def __str__(self):
         return self.name
+    
 class BmpType(models.Model):
     name = models.CharField(max_length=100)
 
@@ -172,7 +173,6 @@ class Scenario(models.Model):
     status = models.CharField(max_length=1, choices=STATUS_CHOICES, default=STATUS_PENDING)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     shared_with = models.ManyToManyField(User, related_name='shared_with_users', null=True, blank=True)
-
 
     def __str__(self):
         return self.name

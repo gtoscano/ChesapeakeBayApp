@@ -91,10 +91,9 @@ def get_exec_solutions(scenario_id, selected_edge, selected_pollutant='N'):
 
         avgs = {key: 0.0 if counts[key] == 0 else round(sums[key] / counts[key]) for key in sums.keys()}
         #avgs = {key: int(round(sums[key] / counts[key])) for key in sums}
-
-
         execs.append({ 'id': execution.id, 'execution': counter, 'solutions': nsolutions, 'avg_Cost': avgs['Cost'], 'avg_N': avgs['N'], 'avg_P': avgs['P'], 'avg_S': avgs['S'] }) 
         counter += 1
+
     return execs, data_points_list
 
 class ListExecutions(LoginRequiredMixin, SingleTableMixin, ListView):
@@ -112,12 +111,14 @@ class ListExecutions(LoginRequiredMixin, SingleTableMixin, ListView):
         execs, data_points = get_exec_solutions(scenario_id, selected_edge)
 
         pareto_front = get_pareto_front(data_points, 'Cost', 'N')
+        areas = scenario.base_scenario.geographic_areas.all()
+        print("Areas: ", areas)
 
         ctx['table'] = ExecutionCustomDataTable(execs)
         ctx['selected_edge'] = selected_edge
         ctx['data_points'] = json.dumps(data_points)
         ctx['pareto_front'] = json.dumps(pareto_front)
-        ctx['page_title'] = 'My Executions'
+        ctx['page_title'] = f'My Executions for {scenario.name}: {scenario.scenario_info}'
         ctx['create_title'] = 'New Execution'
         ctx['create_url'] = reverse('create_execution')
         ctx['scenario_id'] = scenario_id

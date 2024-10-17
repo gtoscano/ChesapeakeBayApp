@@ -80,7 +80,6 @@ class CreateScenario(LoginRequiredMixin, CreateView):
         return super().form_invalid(form)
 
     def form_valid(self, form):
-        print("*** Valid 1 ***")
         geographic_areas_m2m = form.cleaned_data.get('geographic_areas')
 
         # Filter BaseScenarios with the same scenario_info
@@ -105,7 +104,6 @@ class CreateScenario(LoginRequiredMixin, CreateView):
             process_new_base_scenario.delay(base_scenario.id)
             print('Created new BaseScenario', base_scenario)
         
-        print("*** Valid 2 ***")
         # Assign the BaseScenario (new or existing) to the Scenario instance
         form.instance.base_scenario = base_scenario
         form.instance.status = 'P'
@@ -120,8 +118,6 @@ class CreateScenario(LoginRequiredMixin, CreateView):
         loads['total_acres_pct'] = 100.0
 
         form.instance.loads = loads
-
-        print("*** Valid 3 ***")
         # Set the user_id before saving the Scenario instance
         form.instance.user = self.request.user
     
