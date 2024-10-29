@@ -38,6 +38,7 @@ urlpatterns = [
     path('step_4/', include('step_4.urls')),
     path('step_5/', include('step_5.urls')),
     path('step_6/', include('step_6.urls')),
+    path('emails/', include('emails.urls')),
     path('optimization/', include('optimization.urls')),
     path('decision_making/', include('decision_making.urls')),
     path('api4opt/', include('api.urls')),

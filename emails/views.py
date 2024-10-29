@@ -14,7 +14,7 @@ from django_tables2 import SingleTableView, SingleTableMixin
 from django_filters.views import FilterView
 from .models import Email, EmailGroup, EmailMassive, EmailTemplate, EmailInstant
 from .forms import EmailMassiveForm, EmailInstantForm, EmailInstantForm
-from config import settings
+from cast import settings
 from datetime import datetime
 from .tasks import send_emails
 from .tasks import create_email_groups

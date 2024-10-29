@@ -31,6 +31,8 @@ python manage.py migrate
 
 print_message "yellow" "Creating Superuser..."
 python manage.py createsuperuser --noinput --username $DJANGO_SUPERUSER_USERNAME --email $DJANGO_SUPERUSER_EMAIL
+#python manage.py createsuperuser --noinput --first_name Root --last_name Admin --email $DJANGO_SUPERUSER_EMAIL
+
 
 print_message "yellow" "Collecting static files..."
 python manage.py collectstatic --noinput
