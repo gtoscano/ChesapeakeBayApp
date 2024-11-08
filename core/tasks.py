@@ -195,7 +195,6 @@ def make_base_scenario_init_file(base_scenario_id):
         # Update the fields
         base_scenario.base_file.save(out_file.name, out_file, save=False)
 
-
     with open(report_loads_parquet_path, 'rb') as f:
         out_file = File(f, f'reportloads.parquet')
         # Update the fields
@@ -205,6 +204,7 @@ def make_base_scenario_init_file(base_scenario_id):
         out_file = File(f, f'manurenutrientsconfinement.parquet')
         # Update the fields
         base_scenario.manure_nutrients_file.save(out_file.name, out_file, save=False)
+        
     base_scenario.status = 'C'
     base_scenario.completed = timezone.now()
     base_scenario.data = store_json
