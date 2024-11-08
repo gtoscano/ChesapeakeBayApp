@@ -8,21 +8,20 @@
 
 
 {{ total_nitrogen|json_script:"total-nitrogen" }}
-{{ nitrogen|floatformat:0|json_script:"nitrogen" }}
+{{ nitrogen|floatformat:2|json_script:"nitrogen" }}
 {{ nitrogen_pct|json_script:"nitrogen-pct" }}
 
 {{ total_phosphorus|json_script:"total-phosphorus" }}
-{{ phosphorus|floatformat:0|json_script:"phosphorus" }}
+{{ phosphorus|floatformat:2|json_script:"phosphorus" }}
 {{ phosphorus_pct|json_script:"phosphorus-pct" }}
 
 {{ total_sediments|json_script:"total-sediments" }}
-{{ sediments|floatformat:0|json_script:"sediments" }}
+{{ sediments|floatformat:2|json_script:"sediments" }}
 {{ sediments_pct|json_script:"sediments-pct" }}
 
 {{ total_oxygen|json_script:"total-oxygen" }}
-{{ oxygen|floatformat:0|json_script:"oxygen" }}
+{{ oxygen|floatformat:2|json_script:"oxygen" }}
 {{ oxygen_pct|json_script:"oxygen-pct" }}
-
 
 {{ selected_pollutant|json_script:"selected-pollutant" }}
 {{ selected_reduction_target|json_script:"selected-reduction-target" }}

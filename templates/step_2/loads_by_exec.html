@@ -8,19 +8,19 @@
 
 
 {{ total_nitrogen|json_script:"total-nitrogen" }}
-{{ nitrogen|floatformat:0|json_script:"nitrogen" }}
+{{ nitrogen|floatformat:2|json_script:"nitrogen" }}
 {{ nitrogen_pct|json_script:"nitrogen-pct" }}
 
 {{ total_phosphorus|json_script:"total-phosphorus" }}
-{{ phosphorus|floatformat:0|json_script:"phosphorus" }}
+{{ phosphorus|floatformat:2|json_script:"phosphorus" }}
 {{ phosphorus_pct|json_script:"phosphorus-pct" }}
 
 {{ total_sediments|json_script:"total-sediments" }}
-{{ sediments|floatformat:0|json_script:"sediments" }}
+{{ sediments|floatformat:2|json_script:"sediments" }}
 {{ sediments_pct|json_script:"sediments-pct" }}
 
 {{ total_oxygen|json_script:"total-oxygen" }}
-{{ oxygen|floatformat:0|json_script:"oxygen" }}
+{{ oxygen|floatformat:2|json_script:"oxygen" }}
 {{ oxygen_pct|json_script:"oxygen-pct" }}
 
 
@@ -114,7 +114,7 @@
                   x-model="nitrogen" 
                   id="nitrogen_id"
                   name="nitrogen_name"
-                  >
+                  > 
             </td>
           </tr>
           <tr class="h-12" x-data="{ enabled: false }">
@@ -280,7 +280,7 @@
                 this.nitrogen_pct = JSON.parse(document.getElementById('nitrogen-pct').textContent);
                 this.nitrogen_pct = parseFloat(this.nitrogen_pct).toFixed(0);
                 this.nitrogen = JSON.parse(document.getElementById('nitrogen').textContent);
-                this.nitrogen = parseFloat(this.nitrogen).toFixed(0);
+                this.nitrogen = parseFloat(this.nitrogen).toFixed(0);   
 
                 this.total_phosphorus = JSON.parse(document.getElementById('total-phosphorus').textContent);
                 this.phosphorus_pct = JSON.parse(document.getElementById('phosphorus-pct').textContent);
@@ -288,18 +288,13 @@
                 this.phosphorus = JSON.parse(document.getElementById('phosphorus').textContent);
                 this.phosphorus = parseFloat(this.phosphorus).toFixed(0);
 
-
-
                 this.total_sediments = JSON.parse(document.getElementById('total-sediments').textContent);
                 this.sediments_pct = JSON.parse(document.getElementById('sediments-pct').textContent);
                 this.sediments_pct = parseFloat(this.sediments_pct).toFixed(0);
                 this.sediments = JSON.parse(document.getElementById('sediments').textContent);
                 this.sediments = parseFloat(this.sediments).toFixed(0);
 
-
-
                 this.total_oxygen = JSON.parse(document.getElementById('total-oxygen').textContent);
-
                 this.oxygen_pct = JSON.parse(document.getElementById('oxygen-pct').textContent);
                 this.oxygen_pct = parseFloat(this.oxygen_pct).toFixed(0);
                 this.oxygen = JSON.parse(document.getElementById('oxygen').textContent);

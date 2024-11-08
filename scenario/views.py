@@ -28,8 +28,8 @@ class ListScenarioInfos(LoginRequiredMixin, SingleTableMixin, FilterView):
 
     def get_context_data(self, **kwargs):
         ctx = super(ListScenarioInfos, self).get_context_data(**kwargs)
-        ctx['page_title'] = 'My Scenarios InfoWeb'
-        ctx['create_title'] = 'New Scenario Info'
+        ctx['page_title'] = 'My Case Studies InfoWeb'
+        ctx['create_title'] = 'New Case Study Info'
         return ctx
 
     def get_queryset(self):
@@ -57,8 +57,8 @@ class ListScenarios(LoginRequiredMixin, SingleTableMixin, ListView):
 
     def get_context_data(self, **kwargs):
         ctx = super(ListScenarios, self).get_context_data(**kwargs)
-        ctx['page_title'] = 'My Scenarios'
-        ctx['create_title'] = 'New Scenario'
+        ctx['page_title'] = 'My Case Studies'
+        ctx['create_title'] = 'New Case Study'
         ctx['create_url'] = reverse('create_scenario')
         return ctx
 
@@ -134,7 +134,7 @@ class CreateScenario(LoginRequiredMixin, CreateView):
     def get_context_data(self, **kwargs):
         ctx = super(CreateScenario, self).get_context_data(**kwargs)
         ctx['button_name'] = 'Create'
-        ctx['page_title'] = 'New Scenario'
+        ctx['page_title'] = 'New Case Study'
         geographic_areas = GeographicArea.objects.all() 
         states_names = {(state.abbreviation).upper() : state.name for state in State.objects.all()} 
         source_counties = {}

@@ -234,7 +234,7 @@ class Migration(migrations.Migration):
             name='Scenario',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=100, verbose_name='Scenario Name')),
+                ('name', models.CharField(max_length=100, verbose_name='Case Study Name')),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True, verbose_name='Date modified')),
                 ('loads', models.JSONField(blank=True, default=dict, null=True)),
