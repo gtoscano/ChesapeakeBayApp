@@ -7,19 +7,19 @@
 {% block content %}
 
 
-{{ total_nitrogen|floatformat:0|json_script:"total-nitrogen" }}
+{{ total_nitrogen|floatformat:2|json_script:"total-nitrogen" }}
 {{ nitrogen|json_script:"nitrogen" }}
 {{ nitrogen_pct|json_script:"nitrogen-pct" }}
 
-{{ total_phosphorus|floatformat:0|json_script:"total-phosphorus" }}
+{{ total_phosphorus|floatformat:2|json_script:"total-phosphorus" }}
 {{ phosphorus|json_script:"phosphorus" }}
 {{ phosphorus_pct|json_script:"phosphorus-pct" }}
 
-{{ total_sediments|floatformat:0|json_script:"total-sediments" }}
+{{ total_sediments|floatformat:2|json_script:"total-sediments" }}
 {{ sediments|json_script:"sediments" }}
 {{ sediments_pct|json_script:"sediments-pct" }}
 
-{{ total_oxygen|floatformat:0|json_script:"total-oxygen" }}
+{{ total_oxygen|floatformat:2|json_script:"total-oxygen" }}
 {{ oxygen|json_script:"oxygen" }}
 {{ oxygen_pct|json_script:"oxygen-pct" }}
 
@@ -41,6 +41,17 @@
         </ul>
     </div>
     
+
+    <div class="stats shadow w-full mb-4"></div>
+        <div class="stat">
+            <div class="stat-title">Wastewater Dataset</div>
+            <div class="stat-value text-lg">{{ scenario_info }}</div>
+        </div>
+        <div class="stat">
+            <div class="stat-title">Selected Counties</div>
+            <div class="stat-value text-lg">{{ total-budget }}</div>
+        </div>
+    </div>
     <h1 class="text-3xl font-bold">Pollution Load and Implementation Cost Specification</h1>
 
         <div class="dropdown dropdown-hover">

@@ -138,6 +138,8 @@ class LoadsView(LoginRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         scenario_id = self.kwargs.get('id')  # Assuming you're passing the ID in the URL
         scenario = Scenario.objects.get(pk=scenario_id)
+        counties = scenario.base_scenario.geographic_areas.all()
+        counties_list = ", ".join([county.name for county in counties])
         bmps = scenario.bmps
         manure_transport_bmps = False
 
@@ -167,6 +169,9 @@ class LoadsView(LoginRequiredMixin, TemplateView):
             scenario.loads = loads
             scenario.save()
 
+        # counties_list = [county.name for county in scenario.base_scenario.geographic_areas.all()]
+        print("Counties: ", counties_list)
+        context['counties'] = counties_list
         selected_inv_dict = {'EOS':0, 'EOR':1, 'EOT':2}
         selected_reduction_target = selected_inv_dict[loads['selected_reduction_target']]
         context['scenario_info'] = ScenarioInfo.objects.get(pk=scenario.scenario_info.id)

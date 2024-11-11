@@ -54,8 +54,8 @@ class ManureCountySelectionView(LoginRequiredMixin, TemplateView):
         scenario_id = self.kwargs.get('id')  # Assuming you're passing the ID in the URL
         scenario = Scenario.objects.get(pk=scenario_id)
 
-
         counties = scenario.base_scenario.geographic_areas.all()
+        counties_list = ", ".join([county.name for county in counties])
         selected_items = scenario.manure_counties
         print(selected_items)
 
@@ -83,6 +83,8 @@ class ManureCountySelectionView(LoginRequiredMixin, TemplateView):
 
 
         # Extract the lists
+        context['counties'] = counties_list
+        context['scenario_info'] = ScenarioInfo.objects.get(pk=scenario.scenario_info.id)
         context['source_items'] = source_items
         context['target_items'] = target_items
         context['source_items2'] = source_items

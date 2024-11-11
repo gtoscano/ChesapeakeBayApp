@@ -14,7 +14,7 @@
     <div class="flex justify-end mb-4">
 
     </div>
-    <div class="flex justify-center py-6 mb-6" x-data> 
+    <div class="flex justify-center py-2" x-data> 
         <ul class="steps"> 
           <li class="step">
             <a href="{% url 'step_2' scenario_id %}">
@@ -34,6 +34,18 @@
         hx-vals='javascript:{"scenario_id": {{ scenario_id }}, "sourceItems": window.getAllItemsWithCategories("#source-select"), "targetItems": window.getAllItemsWithCategories("#target-select")}'>
     <!-- This div is hidden and used to trigger HTMX requests -->
 </div>
+
+    <div class="stats shadow w-full mb-5">
+    <div class="stat">
+        <div class="stat-title">Wastewater Dataset</div>
+        <div class="stat-value text-lg">{{ scenario_info }}</div>
+    </div>
+    <div class="stat">
+        <div class="stat-title">Selected Counties</div>
+        <div class="stat-value text-lg">{{ counties }}</div>
+    </div>
+    </div>
+
 <div class="flex justify-center mb-6" >
     <h1 class="text-3xl font-bold">BMP Selection</h1>
 </div>
@@ -109,7 +121,7 @@
   document.addEventListener('alpine:init', () => {
     console.log('Initializing global store');
     Alpine.store('globalStore', {
-      targetItemsContainsManureTransport: {{ contains_manure_transport|yesno:"true,false" }},
+      targetItemsContainsManureTransport: {{ contains_manure_transport|yesno:"true,false" }}
     });
   });
   document.body.addEventListener('htmx:beforeSwap', function(event) {
