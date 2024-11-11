@@ -106,6 +106,8 @@ class ListExecutions(LoginRequiredMixin, SingleTableMixin, ListView):
         ctx = super(ListExecutions, self).get_context_data(**kwargs)
         scenario_id = self.kwargs.get('id')
         scenario = Scenario.objects.get(pk=scenario_id)
+        counties = scenario.base_scenario.geographic_areas.all()
+        counties_list = ", ".join([county.name for county in counties])
 
         selected_edge = scenario.loads['selected_reduction_target']
         execs, data_points = get_exec_solutions(scenario_id, selected_edge)
@@ -118,7 +120,7 @@ class ListExecutions(LoginRequiredMixin, SingleTableMixin, ListView):
         ctx['selected_edge'] = selected_edge
         ctx['data_points'] = json.dumps(data_points)
         ctx['pareto_front'] = json.dumps(pareto_front)
-        ctx['page_title'] = f'My Executions for {scenario.name}: {scenario.scenario_info}'
+        ctx['page_title'] = f'My Executions for {counties_list}: {scenario.scenario_info}'
         ctx['create_title'] = 'New Execution'
         ctx['create_url'] = reverse('create_execution')
         ctx['scenario_id'] = scenario_id
