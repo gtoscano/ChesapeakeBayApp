@@ -114,12 +114,14 @@ class ListExecutions(LoginRequiredMixin, SingleTableMixin, ListView):
 
         pareto_front = get_pareto_front(data_points, 'Cost', 'N')
         areas = scenario.base_scenario.geographic_areas.all()
-        print("Areas: ", areas)
+        print("Base: ", list(scenario.base_scenario.data.keys()))
 
         ctx['table'] = ExecutionCustomDataTable(execs)
         ctx['selected_edge'] = selected_edge
         ctx['data_points'] = json.dumps(data_points)
         ctx['pareto_front'] = json.dumps(pareto_front)
+        ctx['total_cost'] = round(scenario.base_scenario.data['total_amount'], 2)
+        ctx['sum_load_total'] = round(scenario.base_scenario.data['sum_load_total'][0], 2)
         ctx['page_title'] = f'My Executions for {counties_list}: {scenario.scenario_info}'
         ctx['create_title'] = 'New Execution'
         ctx['create_url'] = reverse('create_execution')
