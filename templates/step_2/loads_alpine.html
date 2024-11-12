@@ -132,11 +132,14 @@
                       >
                 </div>
             </td>
+            
             <td>
                 <input class="input input-bordered" 
                   :disabled="!selected_pollutant.includes('nitrogen')"
                   x-model="nitrogen" 
                   x-on:input="updateNitrogenPct"
+                  type="text"
+                  x-bind:value="formatNumberWithCommas(parseFloat(nitrogen))"
                   hx-post="{% url 'update_scenario_loads' %}"
                   hx-trigger="input delay:3s"
                   hx-vals='javascript:{"new_value": document.getElementById("nitrogen_pct_id").value.toString(), "scenario_id": {{ scenario_id }}, "field_name": "nitrogen_pct"}'
@@ -177,9 +180,10 @@
             <td>
                 <input class="input input-bordered" 
                   :disabled="!selected_pollutant.includes('phosphorus')"
-                  type="number" 
                   x-model="phosphorus" 
                   x-on:input="updatePhosphorusPct"
+                  type="text"
+                  x-bind:value="formatNumberWithCommas(parseFloat(phosphorus))"
                   hx-post="{% url 'update_scenario_loads' %}"
                   hx-trigger="input delay:3s"
                   hx-vals='javascript:{"new_value": document.getElementById("phosphorus_pct_id").value.toString(), "scenario_id": {{ scenario_id }}, "field_name": "phosphorus_pct"}'
@@ -224,6 +228,8 @@
                   type="number" 
                   x-model="sediments" 
                   x-on:input="updateSedimentsPct"
+                  type="text"
+                  x-bind:value="formatNumberWithCommas(parseFloat(sediments))"
                   hx-post="{% url 'update_scenario_loads' %}"
                   hx-trigger="input delay:3s"
                   hx-vals='javascript:{"new_value": document.getElementById("sediments_pct_id").value.toString(), "scenario_id": {{ scenario_id }}, "field_name": "sediments_pct"}'
@@ -267,6 +273,8 @@
                   type="number" 
                   x-model="oxygen" 
                   x-on:input="updateOxygenPct"
+                  type="text"
+                  x-bind:value="formatNumberWithCommas(parseFloat(oxygen))"
                   hx-post="{% url 'update_scenario_loads' %}"
                   hx-trigger="input delay:3s"
                   hx-vals='javascript:{"new_value": document.getElementById("oxygen_pct_id").value.toString(), "scenario_id": {{ scenario_id }}, "field_name": "oxygen_pct"}'
@@ -343,13 +351,13 @@
                 this.nitrogen_pct = JSON.parse(document.getElementById('nitrogen-pct').textContent);
                 this.nitrogen_pct = parseFloat(this.nitrogen_pct).toFixed(0);
                 this.nitrogen = JSON.parse(document.getElementById('nitrogen').textContent);
-                this.nitrogen = parseFloat(this.nitrogen).toFixed(0);
+                this.nitrogen = parseFloat(this.nitrogen).toFixed(1);
 
                 this.total_phosphorus = JSON.parse(document.getElementById('total-phosphorus').textContent);
                 this.phosphorus_pct = JSON.parse(document.getElementById('phosphorus-pct').textContent);
                 this.phosphorus_pct = parseFloat(this.phosphorus_pct).toFixed(0);
                 this.phosphorus = JSON.parse(document.getElementById('phosphorus').textContent);
-                this.phosphorus = parseFloat(this.phosphorus).toFixed(0);
+                this.phosphorus = parseFloat(this.phosphorus).toFixed(1);
 
 
 
@@ -357,7 +365,7 @@
                 this.sediments_pct = JSON.parse(document.getElementById('sediments-pct').textContent);
                 this.sediments_pct = parseFloat(this.sediments_pct).toFixed(0);
                 this.sediments = JSON.parse(document.getElementById('sediments').textContent);
-                this.sediments = parseFloat(this.sediments).toFixed(0);
+                this.sediments = parseFloat(this.sediments).toFixed(1);
 
 
 
@@ -367,7 +375,7 @@
                 this.oxygen_pct = JSON.parse(document.getElementById('oxygen-pct').textContent);
                 this.oxygen_pct = parseFloat(this.oxygen_pct).toFixed(0);
                 this.oxygen = JSON.parse(document.getElementById('oxygen').textContent);
-                this.oxygen = parseFloat(this.oxygen).toFixed(0);
+                this.oxygen = parseFloat(this.oxygen).toFixed(1);
                 this.selected_pollutant = JSON.parse(document.getElementById('selected-pollutant').textContent);
 
                 console.log(this.selected_pollutant);
@@ -380,25 +388,29 @@
                 //this.selectedReductionTarget = parseInt(this.selectedReductionTarget);
             },
             updateNitrogen() {
-                this.nitrogen = (((100-this.nitrogen_pct)* this.total_nitrogen[this.selectedReductionTarget]) / 100).toFixed(0);
+                let value = ((100-this.nitrogen_pct) * this.total_nitrogen[this.selectedReductionTarget]) / 100;
+                this.nitrogen = value.toFixed(1);
             },
             updateNitrogenPct() {
                 this.nitrogen_pct = (100-(this.nitrogen / this.total_nitrogen[this.selectedReductionTarget]) * 100).toFixed(0);
             },
             updatePhosphorus() {
-                this.phosphorus = (((100-this.phosphorus_pct)* this.total_phosphorus[this.selectedReductionTarget]) / 100).toFixed(0);
+                let value = ((100-this.phosphorus_pct) * this.total_phosphorus[this.selectedReductionTarget]) / 100;
+                this.phosphorus = value.toFixed(1);
             },
             updatePhosphorusPct() {
                 this.phosphorus_pct = (100-(this.phosphorus / this.total_phosphorus[this.selectedReductionTarget]) * 100).toFixed(0);
             },
             updateSediments() {
-                this.sediments = (((100-this.sediments_pct)* this.total_sediments[this.selectedReductionTarget]) / 100).toFixed(0);
+                let value = ((100-this.sediments_pct) * this.total_sediments[this.selectedReductionTarget]) / 100;
+                this.sediments = value.toFixed(1);
             },
             updateSedimentsPct() {
                 this.sediments_pct = (100-(this.sediments / this.total_sediments[this.selectedReductionTarget]) * 100).toFixed(0);
             },
             updateOxygen() {
-                this.oxygen = (((100-this.oxygen_pct)* this.total_oxygen[this.selectedReductionTarget]) / 100).toFixed(0);
+                let value = ((100-this.oxygen_pct) * this.total_oxygen[this.selectedReductionTarget]) / 100;
+                this.oxygen = value.toFixed(1);
             },
             updateOxygenPct() {
                 this.oxygen_pct = (100-(this.oxygen / this.total_oxygen[this.selectedReductionTarget]) * 100).toFixed(0);
@@ -456,7 +468,10 @@
             },
 
             formatNumberWithCommas(x) {
-                return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                if (isNaN(x)) return "0.00";
+                let parts = x.toFixed(1).toString().split(".");
+                parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                return parts.join(".");
             }
            
         };
