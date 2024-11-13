@@ -157,7 +157,8 @@ RUN ./configure && \
 
 WORKDIR /app_src/github/
 RUN git clone https://github.com/gtoscano/CastEvaluation.git && \
-    git clone https://github.com/gtoscano/alfred_aio.git && \
+    #git clone https://github.com/gtoscano/alfred_aio.git && \
+    git clone https://github.com/gtoscano/alfred.git && \
     git clone https://github.com/gtoscano/MSUCast.git && \
     git clone https://github.com/gtoscano/run_base
 
