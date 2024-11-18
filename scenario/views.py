@@ -28,8 +28,8 @@ class ListScenarioInfos(LoginRequiredMixin, SingleTableMixin, FilterView):
 
     def get_context_data(self, **kwargs):
         ctx = super(ListScenarioInfos, self).get_context_data(**kwargs)
-        ctx['page_title'] = 'My Case Studies InfoWeb'
-        ctx['create_title'] = 'New Case Study Info'
+        ctx['page_title'] = 'Optimization Scenarios InfoWeb'
+        ctx['create_title'] = 'New Optimization Scenario Info'
         return ctx
 
     def get_queryset(self):
@@ -57,8 +57,8 @@ class ListScenarios(LoginRequiredMixin, SingleTableMixin, ListView):
 
     def get_context_data(self, **kwargs):
         ctx = super(ListScenarios, self).get_context_data(**kwargs)
-        ctx['page_title'] = 'My Case Studies'
-        ctx['create_title'] = 'New Case Study'
+        ctx['page_title'] = 'Optimization Scenarios'
+        ctx['create_title'] = 'New Optimization Scenario'
         ctx['create_url'] = reverse('create_scenario')
         return ctx
 
@@ -98,6 +98,7 @@ class CreateScenario(LoginRequiredMixin, CreateView):
         else:
             # Create new BaseScenario instance if not exists
             base_scenario = BaseScenario.objects.create(scenario_info=form.instance.scenario_info)
+            print('base_scenario', base_scenario.status)
             base_scenario.geographic_areas.set(geographic_areas_m2m)
             base_scenario.save()
             print('To Create new BaseScenario', base_scenario)
@@ -125,6 +126,7 @@ class CreateScenario(LoginRequiredMixin, CreateView):
         form.instance.save()
     
         # Set the many-to-many fields for the Scenario instance
+        print(form.instance.geographic_areas, geographic_areas_m2m)
         form.instance.geographic_areas.set(geographic_areas_m2m)
     
         # Continue with the rest of the form handling
@@ -134,7 +136,7 @@ class CreateScenario(LoginRequiredMixin, CreateView):
     def get_context_data(self, **kwargs):
         ctx = super(CreateScenario, self).get_context_data(**kwargs)
         ctx['button_name'] = 'Create'
-        ctx['page_title'] = 'New Case Study'
+        ctx['page_title'] = 'New Optimization Scenario'
         geographic_areas = GeographicArea.objects.all() 
         states_names = {(state.abbreviation).upper() : state.name for state in State.objects.all()} 
         source_counties = {}

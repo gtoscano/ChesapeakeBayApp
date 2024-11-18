@@ -157,7 +157,7 @@ class Scenario(models.Model):
         (STATUS_COMPLETE, 'Complete'),
         (STATUS_FAILED, 'Failed')
     ]
-    name = models.CharField(max_length=100, verbose_name='Case Study Name')
+    name = models.CharField(max_length=100, verbose_name='Optimization Scenario Name')
     scenario_info = models.ForeignKey(ScenarioInfo, on_delete=models.CASCADE, verbose_name='Wastewater Data Set')#Wastewater Data Set')
     geographic_areas = models.ManyToManyField(GeographicArea, related_name='geographic_areas', verbose_name='Geographic Scale (counties)')
     base_scenario = models.ForeignKey(BaseScenario, on_delete=models.CASCADE)

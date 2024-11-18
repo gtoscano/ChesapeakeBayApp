@@ -72,6 +72,7 @@ def send_base_scenarios():
     #initialize_globals()
     #failed_scenarios = BaseScenario.objects.filter(status=BaseScenario.STATUS_FAILED)
     failed_or_pending_scenarios = BaseScenario.objects.filter(status='F')
+    
     for scenario in failed_or_pending_scenarios:
         BaseScenario.objects.filter(pk=scenario.id).update(status='E', uuid=uuid4())
         process_new_base_scenario(scenario.id)
@@ -95,7 +96,6 @@ def run_base_scenario(base_scenario_id):
     for geographic_area in geographic_areas:
         geographic_area_list.append(geographic_area.id)
     geography = '_'.join(str(geo) for geo in geographic_area_list)
-
     scenario_name = 'base' 
     historical_crop_need_scenario= 6608
     ncounties = len(geographic_area_list)
@@ -121,6 +121,9 @@ def run_base_scenario(base_scenario_id):
     process = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = process.communicate()
 
+    print(stdout)
+    print(stderr)
+
     stdout_str = stdout.decode('utf-8')
     stderr_str = stderr.decode('utf-8')
     
@@ -142,7 +145,7 @@ def run_base_scenario(base_scenario_id):
 
 
 def make_base_scenario_init_file(base_scenario_id):
-    
+    print("Inside make_base_scenario_init_file")
     BaseScenario.objects.filter(pk=base_scenario_id).update(status='E')
     base_scenario = BaseScenario.objects.get(id=base_scenario_id)
     uuid = base_scenario.uuid
@@ -204,7 +207,7 @@ def make_base_scenario_init_file(base_scenario_id):
         out_file = File(f, f'manurenutrientsconfinement.parquet')
         # Update the fields
         base_scenario.manure_nutrients_file.save(out_file.name, out_file, save=False)
-        
+    
     base_scenario.status = 'C'
     base_scenario.completed = timezone.now()
     base_scenario.data = store_json
@@ -219,11 +222,11 @@ def make_base_scenario_init_file(base_scenario_id):
 
 @shared_task
 def process_new_base_scenario(base_scenario_id):
-
     #initialize_globals()
     run_base_scenario(base_scenario_id)
+    print("Running Base Scenario Done")
     make_base_scenario_init_file(base_scenario_id)
-
+    print("Running Base Scenario Init File Done")
 
 @shared_task
 def process_new_optimization(scenario_id):
