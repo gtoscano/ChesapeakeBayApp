@@ -342,13 +342,13 @@ def process_new_optimization(scenario_id):
 
     if any_lc_bmp or any_animal_bmp:# or any_manure_transport_bmp:
         lc_bmps = 0
-        efficiency_bmps = 0
+        efficiency_bmps = 1
         animal_bmps = 0
         manure_transport_bmps = 0
         if any_lc_bmp:
             lc_bmps = 1
         if any_animal_bmp:
-            animal_bmps = 1
+            animal_bmps = 0
         if any_manure_transport_bmp:
             manure_transport_bmps = 0
 
