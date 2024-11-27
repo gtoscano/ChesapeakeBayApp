@@ -13,7 +13,7 @@ services:
         ./docker-entrypoint.sh gunicorn cast.wsgi:application --bind 0.0.0.0:8000
       "
     ports:
-      - "8001:8000"
+      - "8000:8000"
     depends_on:
       - postgres
       - redis

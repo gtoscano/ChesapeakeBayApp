@@ -24,8 +24,8 @@ load_dotenv(dotenv_path)
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 HOST_IP = os.environ.get('HOST_IP', 'localhost')
-HOST_NAME = os.environ.get('HOST_NAME', 'www.chesapeakebay.app')
-DEV_HOST_NAME = os.environ.get('DEV_HOST_NAME', 'www.dev-chesapeakebay.app')
+HOST_NAME = os.environ.get('HOST_NAME', 'coinlab.chesapeakebay.app')
+DEV_HOST_NAME = os.environ.get('DEV_HOST_NAME', 'dev-coinlabchesapeakebay.app')
 DB_ENGINE = os.environ.get('DB_ENGINE', 'django.db.backends.postgresql')
 DB_HOST = os.environ.get('DB_HOST', 'localhost')
 DB_PORT = os.environ.get('DB_PORT', '5432')

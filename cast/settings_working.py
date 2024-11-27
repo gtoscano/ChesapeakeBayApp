@@ -56,7 +56,7 @@ SECRET_KEY = 'django-insecure-2ooy(!-px2q711qm#ivj7g8v+7*7e+j(xp9%ub$&@bk)x$9v6s
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', HOST, 'localhost', 'cast.toscano.mx','www.chesapeakebay.app','192.168.1.3' ]
+ALLOWED_HOSTS = ['127.0.0.1', HOST, 'localhost', 'cast.toscano.mx','coinlab.chesapeakebay.app','dev-coinlab.chesapeakebay.app','192.168.1.3' ]
 
 CSRF_TRUSTED_ORIGINS = ['http://127.0.0.1:8080', r'http://{HOST}:8080', 'http://localhost:8080', 'https://cast.toscano.mx', 'https://www.chesapeakebay.app', 'http://192.168.1.3:8080']
 
