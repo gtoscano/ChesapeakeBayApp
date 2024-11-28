@@ -122,8 +122,8 @@ class ListExecutions(LoginRequiredMixin, SingleTableMixin, ListView):
         ctx['pareto_front'] = json.dumps(pareto_front)
         ctx['total_cost'] = round(scenario.base_scenario.data['total_amount'], 2)
         ctx['sum_load_total'] = round(scenario.base_scenario.data['sum_load_total'][0], 2)
-        ctx['page_title'] = f'My Executions for {counties_list}: {scenario.scenario_info}'
-        ctx['create_title'] = 'New Execution'
+        ctx['page_title'] = f'Optimization Scenario for {counties_list}: {scenario.scenario_info}'
+        ctx['create_title'] = 'New Optimization Scenario'
         ctx['create_url'] = reverse('create_execution')
         ctx['scenario_id'] = scenario_id
         return ctx
