@@ -782,4 +782,3 @@ def retrieve_optimization_solutions(execution_id, prefix, config_path):
         content_sector_loads = ContentFile(output.getvalue(), name="sector_loads_file.parquet")
         solution.sector_loads_file.save(content_sector_loads.name, content_sector_loads, save=False)
         solution.save()
-

@@ -5,7 +5,7 @@ from django.utils.html import format_html
 
 class ExecutionCustomDataTable(tables.Table):
     id = tables.Column(visible=True)  # Assuming you want to sort by name
-    execution = tables.Column(orderable=True, verbose_name="# Execution")  # Assuming you want to sort by name
+    execution = tables.Column(orderable=True, verbose_name="# Optimization Run")  # Assuming you want to sort by name
     solutions = tables.Column(orderable=True, verbose_name="# Solutions")  # Assuming you want to sort by name
     #avg_Cost = tables.Column(orderable=True)  # Assuming you want to sort by name
     #avg_N = tables.Column(orderable=True, verbose_name='Avg Nitrogen (lbs/yr)')  # Assuming you want to sort by name
