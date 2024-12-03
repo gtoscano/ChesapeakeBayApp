@@ -29,11 +29,11 @@ python manage.py makemigrations
 print_message "yellow" "Applying database migrations..."
 python manage.py migrate
 
-print_message "yellow" "Creating Superuser..."
+print_message "yellow" "Creating Superuser now..."
 
 # // TODO - This super user creation should check if the user already exists
-# python manage.py createsuperuser --noinput --username $DJANGOclea_SUPERUSER_USERNAME --email $DJANGO_SUPERUSER_EMAIL
-#python manage.py createsuperuser --noinput --first_name Root --last_name Admin --email $DJANGO_SUPERUSER_EMAIL
+# python manage.py createsuperuser --noinput --username $DJANGO_SUPERUSER_USERNAME --email $DJANGO_SUPERUSER_EMAIL
+# python manage.py createsuperuser --noinput --first_name Root --last_name Admin --email $DJANGO_SUPERUSER_EMAIL
 
 print_message "yellow" "Collecting static files..."
 python manage.py collectstatic --noinput
