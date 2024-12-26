@@ -61,12 +61,16 @@
 
     <div class="stats shadow w-full mb-5">
         <div class="stat">
-            <div class="stat-title">Base Cost</div>
-            <div class="stat-value">{{ total_cost }}</div>
-        </div>
-        <div class="stat">
             <div class="stat-title">Base Nitrogen Load</div>
-            <div class="stat-value">{{ sum_load_total }}</div>
+            <div class="stat-value" id="sumLoadTotal">{{ sum_load_total }}</div>
+            <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                const sumLoadElement = document.getElementById("sumLoadTotal");
+                const sumLoadTotal = Math.round(parseFloat(sumLoadElement.innerText));  // Round to nearest integer
+                sumLoadElement.innerText = sumLoadTotal.toLocaleString(); // Format as comma-separated
+            });
+            </script>
+              
         </div>
         </div>
 
@@ -222,190 +226,79 @@ function scatterPlotApp() {
         plotData: function(dataSets) {
             const component = this; // Reference to use inside nested functions
             const selectPlotType = this.selectPlotType; // Use the component's state
-            const selectXAxis= this.selectXAxis; // Use the component's state
-            const selectYAxis= this.selectYAxis; // Use the component's state
+            const selectXAxis = this.selectXAxis; // Use the component's state
+            const selectYAxis = this.selectYAxis; // Use the component's state
             const colorPalette = ['blue', 'green', 'orange', 'purple', 'yellow', 'cyan', 'magenta', 'lime', 'pink', 'teal'];
             let trace, layout;
             let traces = []; // Array to hold all the trace objects for Plotly
-            
+        
             if (selectPlotType === 'scatter') {
                 dataSets.forEach((data, dataIndex) => {
-                    let xAxisData = data.map(point => {
-                        if (selectXAxis === 'N') return point.N;
-                        else if (selectXAxis === 'P') return point.P;
-                        else if (selectXAxis === 'S') return point.S;
-                        else if (selectXAxis === 'NR') return point.NR;
-                        else if (selectXAxis === 'PR') return point.PR;
-                        else if (selectXAxis === 'SR') return point.SR;
-                        else if (selectXAxis === 'NP') return point.NP;
-                        else if (selectXAxis === 'PP') return point.PP;
-                        else if (selectXAxis === 'SP') return point.SP;
-                        else return point.Cost; // Default to 'Pollutant' if none match
-                    });
-                    let yAxisData = data.map(point => {
-                        if (selectYAxis === 'N') return point.N;
-                        else if (selectYAxis === 'P') return point.P;
-                        else if (selectYAxis === 'S') return point.S;
-                        else if (selectYAxis === 'NR') return point.NR;
-                        else if (selectYAxis === 'PR') return point.PR;
-                        else if (selectYAxis === 'SR') return point.SR;
-                        else if (selectYAxis === 'NP') return point.NP;
-                        else if (selectYAxis === 'PP') return point.PP;
-                        else if (selectYAxis === 'SP') return point.SP;
-                        else return point.Cost; // Default to 'Pollutant' if none match
-                    });
                     trace = {
-                        x: xAxisData, 
-                        y: yAxisData, 
-                        mode: 'markers+text',
-                        textposition: 'top center',
+                        x: data.map(point => point.Cost),
+                        y: data.map(point => point.Pollutant),
+                        id: data.map(point => point.id),
+                        mode: 'markers', // Removed 'text' from mode to avoid labels
                         type: 'scatter',
-                        text: data.map(point => point.name),
-                        marker: { size:12, color: colorPalette[dataIndex % colorPalette.length] },
-                        name: `Execution ${dataIndex + 1}`
+                        text: data.map(point => `Optimization Run ${dataIndex + 1}`), // Replace "Execution" with "Optimization Run"
+                        marker: { size: 12, color: colorPalette[dataIndex % colorPalette.length] },
+                        name: `Optimization Run ${dataIndex + 1}` // Replace "Execution" with "Optimization Run"
                     };
                     traces.push(trace);
-                });
+                
+                    // Add the sum_load_total line as a horizontal line on the y-axis
+                const sumLoadTotal = Math.round(parseFloat('{{ sum_load_total }}'));  // Round the sum_load_total value to the nearest integer
+                
+                // Determine the new y-axis limit by adding a bit of margin above sum_load_total
+                const yAxisUpperLimit = sumLoadTotal * 1.1;  // Increase by 10%
         
-                // Assuming paretoFront is an array of points similar to dataPoints
-                // And is sorted by 'Cost' for continuity
-                let xAxisDataPF;
-                if (selectXAxis === 'N') {
-                    this.paretoFront.sort((a, b) => a.N - b.N);
-                    xAxisDataPF = this.paretoFront.map(point => point.N);
-                } else if (selectXAxis === 'P') {
-                    this.paretoFront.sort((a, b) => a.P - b.P);
-                    xAxisDataPF = this.paretoFront.map(point => point.P);
-                } else if (selectXAxis === 'S') {
-                    this.paretoFront.sort((a, b) => a.S - b.S);
-                    xAxisDataPF = this.paretoFront.map(point => point.S);
-                } else if (selectXAxis === 'NR') {
-                    this.paretoFront.sort((a, b) => a.NR - b.NR);
-                    xAxisDataPF = this.paretoFront.map(point => point.NR);
-                } else if (selectXAxis === 'PR') {
-                    this.paretoFront.sort((a, b) => a.PR - b.PR);
-                    xAxisDataPF = this.paretoFront.map(point => point.PR);
-                } else if (selectXAxis === 'SR') {
-                    this.paretoFront.sort((a, b) => a.SR - b.SR);
-                    xAxisDataPF = this.paretoFront.map(point => point.SR);
-                } else if (selectXAxis === 'NP') {
-                    this.paretoFront.sort((a, b) => a.NP - b.NP);
-                    xAxisDataPF = this.paretoFront.map(point => point.NP);
-                } else if (selectXAxis === 'PP') {
-                    this.paretoFront.sort((a, b) => a.PP - b.PP);
-                    xAxisDataPF = this.paretoFront.map(point => point.PP);
-                } else if (selectXAxis === 'SP') {
-                    this.paretoFront.sort((a, b) => a.SP - b.SP);
-                    xAxisDataPF = this.paretoFront.map(point => point.SP);
-                } else {
-                    this.paretoFront.sort((a, b) => a.Cost - b.Cost);
-                    xAxisDataPF = this.paretoFront.map(point => point.Cost); // Default case
-                }
-
-                let yAxisDataPF = this.paretoFront.map(point => {
-                    if (selectYAxis === 'N') return point.N;
-                    else if (selectYAxis === 'P') return point.P;
-                    else if (selectYAxis === 'S') return point.S;
-                    else if (selectYAxis === 'NR') return point.NR;
-                    else if (selectYAxis === 'PR') return point.PR;
-                    else if (selectYAxis === 'SR') return point.SR;
-                    else if (selectYAxis === 'NP') return point.NP;
-                    else if (selectYAxis === 'PP') return point.PP;
-                    else if (selectYAxis === 'SP') return point.SP;
-                    else return point.Cost; // Default to 'Pollutant' if none match
-                });
-
-                const paretoTrace = {
-                    x: xAxisDataPF, 
-                    y: yAxisDataPF, 
-                    mode: 'lines',
-                    type: 'scatter',
-                    line: {
-                        color: 'black',
-                        width: 2
-                    },
-                    name: 'Pareto Front'
-                };
-                //traces.push(paretoTrace);
-
-                switch(selectYAxis) {
-                    case 'N':
-                        yAxisTitle = 'Nitrogen (lbs)'; // Replace 'Metric N' with a descriptive name for N
-                        break;
-                    case 'P':
-                        yAxisTitle = 'Phosphorus (lbs)'; // Replace 'Metric P' with a descriptive name for P
-                        break;
-                    case 'S':
-                        yAxisTitle = 'Sediments (lbs)'; // Replace 'Metric S' with a descriptive name for S
-                        break;
-                    case 'NR':
-                        yAxisTitle = 'Nitrogen (lbs)'; // Replace 'Metric N' with a descriptive name for N
-                        break;
-                    case 'PR':
-                        yAxisTitle = 'Phosphorus (lbs)'; // Replace 'Metric P' with a descriptive name for P
-                        break;
-                    case 'SR':
-                        yAxisTitle = 'Sediments (lbs)'; // Replace 'Metric S' with a descriptive name for S
-                        break;
-                    case 'NP':
-                        yAxisTitle = 'Nitrogen (%)'; // Replace 'Metric N' with a descriptive name for N
-                        break;
-                    case 'PP':
-                        yAxisTitle = 'Phosphorus (%)'; // Replace 'Metric P' with a descriptive name for P
-                        break;
-                    case 'SP':
-                        yAxisTitle = 'Sediments (%)'; // Replace 'Metric S' with a descriptive name for S
-                        break;
-                    default:
-                        yAxisTitle = 'Cost (USD $)'; // Default or adjust according to your data
-                        break;
-                }
-                switch(selectXAxis) {
-                    case 'N':
-                        xAxisTitle = 'Nitrogen (lbs)'; // Replace 'Metric N' with a descriptive name for N
-                        break;
-                    case 'P':
-                        xAxisTitle = 'Phosphorus (lbs)'; // Replace 'Metric P' with a descriptive name for P
-                        break;
-                    case 'S':
-                        xAxisTitle = 'Sediments (lbs)'; // Replace 'Metric S' with a descriptive name for S
-                        break;
-                    case 'NR':
-                        xAxisTitle = 'Nitrogen (lbs)'; // Replace 'Metric N' with a descriptive name for N
-                        break;
-                    case 'PR':
-                        xAxisTitle = 'Phosphorus (lbs)'; // Replace 'Metric P' with a descriptive name for P
-                        break;
-                    case 'SR':
-                        xAxisTitle = 'Sediments (lbs)'; // Replace 'Metric S' with a descriptive name for S
-                        break;
-                    case 'NP':
-                        xAxisTitle = 'Nitrogen (%)'; // Replace 'Metric N' with a descriptive name for N
-                        break;
-                    case 'PP':
-                        xAxisTitle = 'Phosphorus (%)'; // Replace 'Metric P' with a descriptive name for P
-                        break;
-                    case 'SP':
-                        xAxisTitle = 'Sediments (%)'; // Replace 'Metric S' with a descriptive name for S
-                        break;
-                    default:
-                        xAxisTitle = 'Cost (USD $)'; // Default or adjust according to your data
-                        break;
-                }
+                // Add the line shape and annotation for the base load
                 layout = {
                     hovermode: 'closest',
                     title: 'Pareto Front',
                     xaxis: {
-                        title: xAxisTitle 
+                        title: 'Cost'
                     },
                     yaxis: {
-                        title: yAxisTitle 
+                        title: 'Pollutant',
+                        range: [0, yAxisUpperLimit]  // Set the y-axis range to go above the red line
                     },
+                    shapes: [
+                        {
+                            type: 'line',
+                            x0: Math.min(...dataSets[0].map(point => point.Cost)),  // Start of the line on x-axis
+                            x1: Math.max(...dataSets[0].map(point => point.Cost)),  // End of the line on x-axis
+                            y0: sumLoadTotal,  // y-coordinate of the line
+                            y1: sumLoadTotal,  // Same y-coordinate to make it a horizontal line
+                            line: {
+                                color: 'red',  // Color of the line
+                                width: 2,      // Width of the line
+                                dash: 'dot'    // Line style (dotted line)
+                            }
+                        }
+                    ],
+                    annotations: [
+                        {
+                            x: Math.max(...dataSets[0].map(point => point.Cost)) * 0.9, // Position the annotation near the right end of the plot
+                            y: sumLoadTotal,  // Position the annotation at the red line
+                            text: 'Base Load', // The label text
+                            showarrow: true,  // Display the arrow pointing to the line
+                            arrowhead: 2,     // Arrow style
+                            ax: 0,            // X-offset for the annotation
+                            ay: -20,          // Y-offset to position the label above the line
+                            font: {
+                                size: 12,
+                                color: 'red'   // Color of the annotation text
+                            }
+                        }
+                    ],
                     showlegend: true // Optional: show legend to differentiate instances
                 };
+                });
             }
+        
             Plotly.newPlot('plot', traces, layout);
-        },
+        },          
     };
 }
 function scatterPlotApp2() {
@@ -430,9 +323,12 @@ function scatterPlotApp2() {
         plotData: function(dataSets) {
             const component = this; // Reference to use inside nested functions
             const selectPlotType = this.selectPlotType; // Use the component's state
+            const selectXAxis = this.selectXAxis; // Use the component's state
+            const selectYAxis = this.selectYAxis; // Use the component's state
             const colorPalette = ['blue', 'green', 'orange', 'purple', 'yellow', 'cyan', 'magenta', 'lime', 'pink', 'teal'];
             let trace, layout;
             let traces = []; // Array to hold all the trace objects for Plotly
+        
             if (selectPlotType === 'scatter') {
                 dataSets.forEach((data, dataIndex) => {
                     trace = {
@@ -443,12 +339,16 @@ function scatterPlotApp2() {
                         textposition: 'top center',
                         type: 'scatter',
                         text: data.map(point => point.name),
-                        marker: { size:12, color: colorPalette[dataIndex % colorPalette.length] },
-                        name: `Execution ${dataIndex + 1}`
+                        marker: { size: 12, color: colorPalette[dataIndex % colorPalette.length] },
+                        name: `Optimization Run ${dataIndex + 1}`
                     };
                     traces.push(trace);
                 });
-
+        
+                // Add the sum_load_total line as a horizontal line on the y-axis
+                const sumLoadTotal = Math.round(parseFloat('{{ sum_load_total }}'));  // Round the sum_load_total value to the nearest integer
+                
+                // Add the line shape to the layout
                 layout = {
                     hovermode: 'closest',
                     title: 'Pareto Front',
@@ -458,13 +358,25 @@ function scatterPlotApp2() {
                     yaxis: {
                         title: 'Pollutant'
                     },
+                    shapes: [
+                        {
+                            type: 'line',
+                            x0: Math.min(...dataSets[0].map(point => point.Cost)),  // Start of the line on x-axis
+                            x1: Math.max(...dataSets[0].map(point => point.Cost)),  // End of the line on x-axis
+                            y0: sumLoadTotal,  // y-coordinate of the line
+                            y1: sumLoadTotal,  // Same y-coordinate to make it a horizontal line
+                            line: {
+                                color: 'red',  // Color of the line
+                                width: 2,      // Width of the line
+                                dash: 'dot'    // Line style (dotted line)
+                            }
+                        }
+                    ],
                     showlegend: true // Optional: show legend to differentiate instances
-
                 };
-                showlegend: true // Optional: show legend to differentiate instances
             }
+        
             Plotly.newPlot('plot', traces, layout);
-
         },
     };
 }

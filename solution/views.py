@@ -215,8 +215,8 @@ class ListSolutionsAlpine(LoginRequiredMixin, SingleTableMixin, ListView):
         ctx['edge_options'] = edge_options
         ctx['load_data'] = data_list 
         ctx['selected_edge'] = selected_edge
-        ctx['page_title'] = 'My Solutions'
-        ctx['execution_id'] =execution_id 
+        ctx['page_title'] = 'Optimized Solutions'
+        ctx['execution_id'] = execution_id 
         return ctx
 
 def get_solutions(execution_id, selected_edge):
@@ -293,6 +293,7 @@ class ListSolutionsHTMX(LoginRequiredMixin, SingleTableMixin, ListView):
     def get_context_data(self, **kwargs):
         ctx = super(ListSolutionsHTMX, self).get_context_data(**kwargs)
         execution_id = self.kwargs.get('id')
+        scenario = Scenario.objects.get(pk=execution_id)
 
         #retrieve_optization_solutions(23)
         execution = Execution.objects.get(id=execution_id)
@@ -322,7 +323,8 @@ class ListSolutionsHTMX(LoginRequiredMixin, SingleTableMixin, ListView):
         ctx['selected_edge'] = selected_edge
         ctx['data_points'] = json.dumps(data_points)
         #ctx['data_points2'] = json.dumps(embedding_lst)
-        ctx['page_title'] = 'My Solutions'
+        ctx['sum_load_total'] = round(scenario.base_scenario.data['sum_load_total'][0], 2)
+        ctx['page_title'] = 'Optimized Solutions'
         ctx['execution_id'] = execution_id 
         return ctx
 
@@ -381,7 +383,7 @@ class ListSolutionsHTMX(LoginRequiredMixin, SingleTableMixin, ListView):
 
         else:
             return super().get(request, *args, **kwargs)
-            #context = self.get_context_data(table=table, selected_edge=selected_edge, execution_id=execution_id, page_title='My Solutions')
+            #context = self.get_context_data(table=table, selected_edge=selected_edge, execution_id=execution_id, page_title='Optimized Solutions')
             #html = render_to_string('solution/partials/_table.html', context, request=request)
             #return HttpResponse(html)
 def get_scenario_data(request):
@@ -456,7 +458,7 @@ class PlotSolutions(LoginRequiredMixin, ListView):
         ctx['edge_seleted'] = 'Eos'
         ctx['pollutan_selected'] = 'N'
 
-        ctx['page_title'] = 'My Solutions'
+        ctx['page_title'] = 'Optimized Solutions'
         ctx['create_title'] = 'New Solution'
         ctx['create_url'] = reverse('create_solution')
         ctx['execution_id'] =execution_id 

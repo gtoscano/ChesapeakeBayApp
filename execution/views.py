@@ -19,6 +19,7 @@ from core.tasks import process_new_base_scenario
 from core.models import Bmp, BmpCategory,  BmpType
 from .filters import ExecutionFilter
 from solution.views import get_solutions
+from django.http import Http404
 
 from core.tasks import retrieve_optimization_solutions
 
@@ -104,28 +105,34 @@ class ListExecutions(LoginRequiredMixin, SingleTableMixin, ListView):
 
     def get_context_data(self, **kwargs):
         ctx = super(ListExecutions, self).get_context_data(**kwargs)
-        scenario_id = self.kwargs.get('id')
-        scenario = Scenario.objects.get(pk=scenario_id)
-        counties = scenario.base_scenario.geographic_areas.all()
-        counties_list = ", ".join([county.name for county in counties])
+        try:
+            scenario_id = self.kwargs.get('id')
+            scenario = Scenario.objects.get(pk=scenario_id)
+            counties = scenario.base_scenario.geographic_areas.all()
+            counties_list = ", ".join([county.name for county in counties])
 
-        selected_edge = scenario.loads['selected_reduction_target']
-        execs, data_points = get_exec_solutions(scenario_id, selected_edge)
+            selected_edge = scenario.loads['selected_reduction_target']
+            execs, data_points = get_exec_solutions(scenario_id, selected_edge)
 
-        pareto_front = get_pareto_front(data_points, 'Cost', 'N')
-        areas = scenario.base_scenario.geographic_areas.all()
-        print("Base: ", list(scenario.base_scenario.data.keys()))
+            pareto_front = get_pareto_front(data_points, 'Cost', 'N')
+            areas = scenario.base_scenario.geographic_areas.all()
+            print("Base: ", list(scenario.base_scenario.data.keys()))
+            print("Valid Loads: ", scenario.base_scenario.data['sum_load_total'])
 
-        ctx['table'] = ExecutionCustomDataTable(execs)
-        ctx['selected_edge'] = selected_edge
-        ctx['data_points'] = json.dumps(data_points)
-        ctx['pareto_front'] = json.dumps(pareto_front)
-        ctx['total_cost'] = round(scenario.base_scenario.data['total_amount'], 2)
-        ctx['sum_load_total'] = round(scenario.base_scenario.data['sum_load_total'][0], 2)
-        ctx['page_title'] = f'Optimization Runs for {counties_list}: {scenario.scenario_info}'
-        ctx['create_title'] = 'New Optimization Scenario'
-        ctx['create_url'] = reverse('create_execution')
-        ctx['scenario_id'] = scenario_id
+            ctx['table'] = ExecutionCustomDataTable(execs)
+            ctx['selected_edge'] = selected_edge
+            ctx['data_points'] = json.dumps(data_points)
+            ctx['pareto_front'] = json.dumps(pareto_front)
+            ctx['total_cost'] = round(scenario.base_scenario.data['total_amount'], 2)
+            ctx['sum_load_total'] = round(scenario.base_scenario.data['sum_load_total'][0], 2)
+            ctx['page_title'] = f'Optimization Runs for {counties_list}: {scenario.scenario_info}'
+            ctx['create_title'] = 'New Optimization Scenario'
+            ctx['create_url'] = reverse('create_execution')
+            ctx['scenario_id'] = scenario_id
+        
+        except Exception as e:
+            raise Http404("Scenario not sent for optimization.")
+        
         return ctx
     
     def get_queryset(self):

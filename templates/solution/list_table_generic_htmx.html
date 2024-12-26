@@ -271,23 +271,28 @@ function scatterPlotApp() {
         plotData: function(data) {
             const component = this; // Reference to use inside nested functions
             const selectPlotType = this.selectPlotType; // Use the component's state
+            const sumLoadTotal = Math.round(parseFloat('{{ sum_load_total }}'));  // Use the sum_load_total from the context, rounded
             // Update colors based on selected indices
             let colors = data.map((_, index) => 
                 this.selectedIndices.includes(index) ? 'red' : 'blue');
             let trace, layout;
+            
+            // Determine the new y-axis limit by adding a bit of margin above sum_load_total
+            const yAxisUpperLimit = sumLoadTotal * 1.1;  // Increase by 10%
+        
             if (selectPlotType === 'scatter') {
-
                 trace = {
                     x: data.map(point => point.Cost),
                     y: data.map(point => point.Pollutant),
                     id: data.map(point => point.id),
-                    mode: 'markers+text',
+                    mode: 'markers',
                     textposition: 'top center',
                     type: 'scatter',
                     text: data.map(point => point.name),
                     marker: { size: 12, color: colors },
+                    name: `Optimization Run Solutions`
                 };
-
+        
                 layout = {
                     hovermode: 'closest',
                     title: 'Pareto Front',
@@ -295,8 +300,39 @@ function scatterPlotApp() {
                         title: 'Cost'
                     },
                     yaxis: {
-                        title: 'Pollutant'
-                    }
+                        title: 'Pollutant',
+                        range: [0, yAxisUpperLimit]  // Set the y-axis range to go above the red line
+                    },
+                    shapes: [
+                        {
+                            type: 'line',
+                            x0: Math.min(...data.map(point => point.Cost)),  // Start of the line on x-axis
+                            x1: Math.max(...data.map(point => point.Cost)),  // End of the line on x-axis
+                            y0: sumLoadTotal,  // y-coordinate of the line
+                            y1: sumLoadTotal,  // Same y-coordinate to make it a horizontal line
+                            line: {
+                                color: 'red',  // Color of the line
+                                width: 2,      // Width of the line
+                                dash: 'dot'    // Line style (dotted line)
+                            }
+                        }
+                    ],
+                    annotations: [
+                        {
+                            x: Math.max(...data.map(point => point.Cost)) * 0.9, // Position the annotation near the right end of the plot
+                            y: sumLoadTotal,  // Position the annotation at the red line
+                            text: 'Base Load', // The label text
+                            showarrow: true,  // Display the arrow pointing to the line
+                            arrowhead: 2,     // Arrow style
+                            ax: 0,            // X-offset for the annotation
+                            ay: -20,          // Y-offset to position the label above the line
+                            font: {
+                                size: 12,
+                                color: 'red'   // Color of the annotation text
+                            }
+                        }
+                    ],
+                    showlegend: true // Optional: show legend to differentiate instances
                 };
             } else if (selectPlotType === 'scatter3D'){
                 trace = {
@@ -344,7 +380,7 @@ function scatterPlotApp() {
                         showscale: true,
                         cmin: Math.min(...data.map(point => point.Cost)),
                         cmax: Math.max(...data.map(point => point.Cost)),
-
+        
                     },
                     dimensions: [
                         { label: 'Nitrogen (lbs/yr)', values: data.map(point => point.N) },
@@ -353,18 +389,18 @@ function scatterPlotApp() {
                         { label: 'Cost (USD)', values: data.map(point => point.Cost) },
                         // Add other dimensions as needed
                     ],
-
+        
                     // Adding hover information using custom data
                     customdata: data.map(point => point.name),
                     hoverinfo: 'none', // Disable default hover info
                     hovertemplate: '%{customdata}<extra></extra>', 
-
+        
                 };
                 layout = {
                     hovermode: 'closest',
                     title: 'Parallel Coordinates Plot',
                 };
-
+        
             } else if (selectPlotType === 'splom') {
                 // Scatter Plot Matrix (SPLOM) configuration
                 dimensions = [
@@ -394,13 +430,13 @@ function scatterPlotApp() {
                 // Heatmap configuration
                 // Assuming 'data' is structured appropriately; you might need to adjust this
                 // Example assumes 'data' could be transformed into a matrix form
-                
+        
                 // Example data transformation or setup
-
+        
                 const zValues = data.map(row => [row.Cost]); // Each row's Cost becomes a cell's intensity
                 const xValues = ['N']; // Simplified for demonstration
                 const yValues = data.map(row => row.P.toString()); // Assuming P values are distinct
-
+        
             
                 trace = {
                     z: zValues,
@@ -416,13 +452,14 @@ function scatterPlotApp() {
                     yaxis: {title: 'Phosphorus'}
                 };
             }
+        
             Plotly.newPlot('plot', [trace], layout);
-
+        
             document.getElementById('plot').on('plotly_click', function(data) {
                 component.handlePlotlyClick(data);
-
             });
         },
+                
     };
 }
     window.scatterPlotApp = scatterPlotApp; // Make scatterPlotApp globally available
