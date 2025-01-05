@@ -108,7 +108,8 @@
                       >
                 </div>
             </td>
-            <td>
+            <td class="text-left"><div x-text="formatNumberWithCommas(parseFloat(nitrogen))"></div></td>
+            <!-- <td>
                 <input class="input input-bordered" 
                   disabled
                   type="number"
@@ -116,7 +117,7 @@
                   id="nitrogen_id"
                   name="nitrogen_name"
                   > 
-            </td>
+            </td> -->
           </tr>
           <tr class="h-12" x-data="{ enabled: false }">
             <td>
@@ -141,7 +142,8 @@
                   disabled
                   >
             </td>
-            <td>
+            <td class="text-left"><div x-text="formatNumberWithCommas(parseFloat(phosphorus))"></div></td>
+            <!-- <td>
                 <input class="input input-bordered" 
                   disabled
                   type="number" 
@@ -150,7 +152,7 @@
                   name="phosphorus_name"
                   disabled
                   >
-            </td>
+            </td> -->
           </tr>
           <tr class="h-12" x-data="{ enabled: false }">
             <td>
@@ -175,7 +177,8 @@
                   name="sediments_pct_name"
                   >
             </td>
-            <td>
+            <td class="text-left"><div x-text="formatNumberWithCommas(parseFloat(sediments))"></div></td>
+            <!-- <td>
                 <input class="input input-bordered"
                   disabled
                   type="number" 
@@ -183,7 +186,7 @@
                   id="sediments_id"
                   name="sediments_name"
                   >
-            </td>
+            </td> -->
           </tr>
           <tr class="h-12" x-data="{ enabled: false }">
             <td>
@@ -206,7 +209,8 @@
                   name="oxygen_pct_name"
                   >
             </td>
-            <td>
+            <td class="text-left"><div x-text="formatNumberWithCommas(parseFloat(oxygen))"></div></td>
+            <!-- <td>
                 <input class="input input-bordered"
                   disabled
                   type="number" 
@@ -214,7 +218,7 @@
                   id="oxygen_id"
                   name="oxygen_name"
                   >
-            </td>
+            </td> -->
           </tr>
         </tbody>
     </table>

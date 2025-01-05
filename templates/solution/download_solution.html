@@ -64,13 +64,28 @@
 <script>
 
 $(document).ready(function() {
+    // Initialize the DataTable with drawCallback
     $('.my-table').DataTable({
-        "paging": false, // Enable paging
-        "searching": false, // Enable the search box
+        "paging": false, // Disable paging
+        "searching": false, // Disable the search box
         "ordering": true, // Enable column ordering
         "autoWidth": false, // Disable the autoWidth feature
+        "drawCallback": function(settings) {
+            // Format numbers in the table with commas after each draw
+            $('#bmp_table tbody tr td').each(function() {
+                var cellText = $(this).text().trim();
+                // Check if the cell text is a number (ignoring non-numeric cells like text)
+                if (!isNaN(cellText) && cellText !== '') {
+                    // Format the number with commas
+                    var formattedText = parseFloat(cellText).toLocaleString('en-US');
+                    $(this).text(formattedText); // Replace the cell content with the formatted value
+                }
+            });
+        }
     });
 });
+    
+    
 document.body.addEventListener('htmx:afterRequest', function(event) {
     var response = event.detail.xhr.response;
     try {

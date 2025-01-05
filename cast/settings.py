@@ -344,6 +344,21 @@ DATABASES = {
         'PORT': DB_PORT,       # The default port PostgreSQL listens on
     }
 }
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'your_db_name',
+#         'USER': 'postgres',
+#         'PASSWORD': 'your_password',  # Make sure this is correct
+#         'HOST': '127.0.0.1',
+#         'PORT': '5432',
+#     }
+# }
+
+print(f"Postgres Host: {DB_HOST}")
+print(f"Postgres Password: {POSTGRES_PASSWORD}")
+
+
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators

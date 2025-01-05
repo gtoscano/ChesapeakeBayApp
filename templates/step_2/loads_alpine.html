@@ -132,8 +132,10 @@
                       >
                 </div>
             </td>
+
+            <td class="text-left"><div x-text="formatNumberWithCommas(parseFloat(nitrogen))"></div></td>
             
-            <td>
+            <!-- <td>
                 <input class="input input-bordered" 
                   :disabled="!selected_pollutant.includes('nitrogen')"
                   x-model="nitrogen" 
@@ -146,7 +148,7 @@
                   id="nitrogen_id"
                   name="nitrogen_name"
                   >
-            </td>
+            </td> -->
           </tr>
           <tr class="h-12" x-data="{ enabled: false }">
             <td>
@@ -177,7 +179,8 @@
                   name="phosphorus_pct_name"
                   >
             </td>
-            <td>
+            <td class="text-left"><div x-text="formatNumberWithCommas(parseFloat(phosphorus))"></div></td>
+            <!-- <td>
                 <input class="input input-bordered" 
                   :disabled="!selected_pollutant.includes('phosphorus')"
                   x-model="phosphorus" 
@@ -190,7 +193,7 @@
                   id="phosphorus_id"
                   name="phosphorus_name"
                   >
-            </td>
+            </td> -->
           </tr>
           <tr class="h-12" x-data="{ enabled: false }">
             <td>
@@ -222,7 +225,8 @@
                   name="sediments_pct_name"
                   >
             </td>
-            <td>
+            <td class="text-left"><div x-text="formatNumberWithCommas(parseFloat(sediments))"></div></td>
+            <!-- <td>
                 <input class="input input-bordered"
                   :disabled="!selected_pollutant.includes('sediments')"
                   type="number" 
@@ -236,7 +240,7 @@
                   id="sediments_id"
                   name="sediments_name"
                   >
-            </td>
+            </td> -->
           </tr>
           <tr class="h-12" x-data="{ enabled: false }">
             <td>
@@ -267,7 +271,8 @@
                   name="oxygen_pct_name"
                   >
             </td>
-            <td>
+            <td class="text-left"><div x-text="formatNumberWithCommas(parseFloat(oxygen))"></div></td>
+            <!-- <td>
                 <input class="input input-bordered"
                   :disabled="!selected_pollutant.includes('oxygen')"
                   type="number" 
@@ -281,7 +286,7 @@
                   id="oxygen_id"
                   name="oxygen_name"
                   >
-            </td>
+            </td> -->
           </tr>
         </tbody>
     </table>
@@ -351,13 +356,13 @@
                 this.nitrogen_pct = JSON.parse(document.getElementById('nitrogen-pct').textContent);
                 this.nitrogen_pct = parseFloat(this.nitrogen_pct).toFixed(0);
                 this.nitrogen = JSON.parse(document.getElementById('nitrogen').textContent);
-                this.nitrogen = parseFloat(this.nitrogen).toFixed(1);
+                this.nitrogen = parseFloat(this.nitrogen).toFixed(0);
 
                 this.total_phosphorus = JSON.parse(document.getElementById('total-phosphorus').textContent);
                 this.phosphorus_pct = JSON.parse(document.getElementById('phosphorus-pct').textContent);
                 this.phosphorus_pct = parseFloat(this.phosphorus_pct).toFixed(0);
                 this.phosphorus = JSON.parse(document.getElementById('phosphorus').textContent);
-                this.phosphorus = parseFloat(this.phosphorus).toFixed(1);
+                this.phosphorus = parseFloat(this.phosphorus).toFixed(0);
 
 
 
@@ -365,7 +370,7 @@
                 this.sediments_pct = JSON.parse(document.getElementById('sediments-pct').textContent);
                 this.sediments_pct = parseFloat(this.sediments_pct).toFixed(0);
                 this.sediments = JSON.parse(document.getElementById('sediments').textContent);
-                this.sediments = parseFloat(this.sediments).toFixed(1);
+                this.sediments = parseFloat(this.sediments).toFixed(0);
 
 
 
@@ -375,7 +380,7 @@
                 this.oxygen_pct = JSON.parse(document.getElementById('oxygen-pct').textContent);
                 this.oxygen_pct = parseFloat(this.oxygen_pct).toFixed(0);
                 this.oxygen = JSON.parse(document.getElementById('oxygen').textContent);
-                this.oxygen = parseFloat(this.oxygen).toFixed(1);
+                this.oxygen = parseFloat(this.oxygen).toFixed(0);
                 this.selected_pollutant = JSON.parse(document.getElementById('selected-pollutant').textContent);
 
                 console.log(this.selected_pollutant);
@@ -389,28 +394,28 @@
             },
             updateNitrogen() {
                 let value = ((100-this.nitrogen_pct) * this.total_nitrogen[this.selectedReductionTarget]) / 100;
-                this.nitrogen = value.toFixed(1);
+                this.nitrogen = value.toFixed(0);
             },
             updateNitrogenPct() {
                 this.nitrogen_pct = (100-(this.nitrogen / this.total_nitrogen[this.selectedReductionTarget]) * 100).toFixed(0);
             },
             updatePhosphorus() {
                 let value = ((100-this.phosphorus_pct) * this.total_phosphorus[this.selectedReductionTarget]) / 100;
-                this.phosphorus = value.toFixed(1);
+                this.phosphorus = value.toFixed(0);
             },
             updatePhosphorusPct() {
                 this.phosphorus_pct = (100-(this.phosphorus / this.total_phosphorus[this.selectedReductionTarget]) * 100).toFixed(0);
             },
             updateSediments() {
                 let value = ((100-this.sediments_pct) * this.total_sediments[this.selectedReductionTarget]) / 100;
-                this.sediments = value.toFixed(1);
+                this.sediments = value.toFixed(0);
             },
             updateSedimentsPct() {
                 this.sediments_pct = (100-(this.sediments / this.total_sediments[this.selectedReductionTarget]) * 100).toFixed(0);
             },
             updateOxygen() {
                 let value = ((100-this.oxygen_pct) * this.total_oxygen[this.selectedReductionTarget]) / 100;
-                this.oxygen = value.toFixed(1);
+                this.oxygen = value.toFixed(0);
             },
             updateOxygenPct() {
                 this.oxygen_pct = (100-(this.oxygen / this.total_oxygen[this.selectedReductionTarget]) * 100).toFixed(0);
@@ -468,8 +473,8 @@
             },
 
             formatNumberWithCommas(x) {
-                if (isNaN(x)) return "0.00";
-                let parts = x.toFixed(1).toString().split(".");
+                if (isNaN(x)) return "0";
+                let parts = x.toFixed(0).toString().split(".");
                 parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                 return parts.join(".");
             }
